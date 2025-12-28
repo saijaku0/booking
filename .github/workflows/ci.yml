@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "feature/*", "refactor/*", "test/*"]
   pull_request:
-    branches: [ $default-branch ]
+    branches: [ "develop" ]
 
 permissions:
   contents: write
@@ -12,6 +12,22 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: booking_admin
+          POSTGRES_PASSWORD: SecretSuperPassword
+          POSTGRES_DB: booking_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     strategy:
       matrix:
         dotnet-version: ["8.0.x", "9.0.x", "10.0.x"]
@@ -29,35 +45,30 @@ jobs:
         run: dotnet restore
 
       - name: Test with dotnet
-        run: dotnet test --no-restore --logger trx --results-directory "TestResults-${{ matrix.dotnet-version }}"
+        run: dotnet build --no-restore --configuration Release
 
       - name: Upload dotnet test results
-        uses: actions/upload-artifact@v4
-        with:
-          name: dotnet-results-${{ matrix.dotnet-version }}
-          path: TestResults-${{ matrix.dotnet-version }}
-        if: ${{ always() }}
+        run: dotnet test --no-build --configuration Release --logger trx --results-directory "TestResults"
+        env: 
+          ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=booking_db;Username=booking_admin;Password=SecretSuperPassword"
 
   merge-to-develop:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/develop'
+    if: github.event_name == 'push' && github.ref != 'refs/heads/develop'
     steps: 
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
+
       - name: Merge changes to develop
         run: |
-          # Настраиваем git от имени бота
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           
-          # Переключаемся на develop и сливаем изменения
           git fetch origin develop
           git checkout develop
           git merge ${{ github.sha }} --no-edit
           
-          # Пушим в develop
           git push origin develop
