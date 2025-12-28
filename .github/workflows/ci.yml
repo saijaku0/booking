@@ -1,0 +1,63 @@
+name: .NET CI & Auto-Merge
+
+on:
+  push:
+    branches: [ "feature/*", "refactor/*", "test/*"]
+  pull_request:
+    branches: [ $default-branch ]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: ["8.0.x", "9.0.x", "10.0.x"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Test with dotnet
+        run: dotnet test --no-restore --logger trx --results-directory "TestResults-${{ matrix.dotnet-version }}"
+
+      - name: Upload dotnet test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-results-${{ matrix.dotnet-version }}
+          path: TestResults-${{ matrix.dotnet-version }}
+        if: ${{ always() }}
+
+  merge-to-develop:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/develop'
+    steps: 
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Merge changes to develop
+        run: |
+          # Настраиваем git от имени бота
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          
+          # Переключаемся на develop и сливаем изменения
+          git fetch origin develop
+          git checkout develop
+          git merge ${{ github.sha }} --no-edit
+          
+          # Пушим в develop
+          git push origin develop
