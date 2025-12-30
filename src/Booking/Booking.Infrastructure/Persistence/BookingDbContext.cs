@@ -1,9 +1,10 @@
+using Booking.Application.Common.Interfaces;
 using Booking.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Booking.Infrastructure.Persistence;
 
-public class BookingDbContext(DbContextOptions<BookingDbContext> options) : DbContext(options)
+public class BookingDbContext(DbContextOptions<BookingDbContext> options) : DbContext(options), IBookingDbContext
 {
     public DbSet<Appointment> Appointments { get; set; }
 
