@@ -1,4 +1,5 @@
 ﻿using Booking.Application.Appointments.Commands.CreateAppointment;
+using Booking.Application.Appointments.Queries.GetAppointmentById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,7 +26,9 @@ namespace Booking.API.Controllers
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            return Ok(); 
+            var appointment = await _mediator.Send(new GetAppointmentByIdQuery { Id = id });
+
+            return Ok(appointment); 
         }
     }
 }
