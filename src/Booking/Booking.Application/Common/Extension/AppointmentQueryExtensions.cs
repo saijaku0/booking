@@ -6,12 +6,12 @@ namespace Booking.Application.Common.Extension
     {
         public static IQueryable<Appointment> WhereOverlaps(
         this IQueryable<Appointment> query,
-        Guid resourceId,
+        Guid? resourceId,
         DateTime start,
         DateTime end)
         {
             return query.Where(x => 
-                x.ResourceId == resourceId
+                (!resourceId.HasValue || x.ResourceId == resourceId)
                     &&
                 start < x.EndTime
                     &&

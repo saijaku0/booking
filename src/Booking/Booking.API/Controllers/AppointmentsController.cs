@@ -1,6 +1,10 @@
 ﻿using Booking.Application.Appointments.Commands.CreateAppointment;
+using Booking.Application.Appointments.Dtos;
 using Booking.Application.Appointments.Queries.GetAppointmentById;
+using Booking.Application.Appointments.Queries.GetAppointmentsByDate;
+using Booking.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Booking.API.Controllers
@@ -29,6 +33,22 @@ namespace Booking.API.Controllers
             var appointment = await _mediator.Send(new GetAppointmentByIdQuery { Id = id });
 
             return Ok(appointment); 
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<AppointmentDto>>> GetAppointmentsByDateQuery(
+            [FromQuery] Guid resourceId,
+            [FromQuery] DateTime start, 
+            [FromQuery] DateTime end)
+        {
+            var getAppointmentsDate = await _mediator.Send(new GetAppointmentsByDateQuery
+            {
+                ResourceId = resourceId,
+                StartTime = start,
+                EndTime = end
+            });
+
+            return Ok(getAppointmentsDate);
         }
     }
 }
