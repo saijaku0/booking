@@ -1,4 +1,4 @@
-﻿namespace Booking.Application.Appointments.Queries.GetAppointmentById
+﻿namespace Booking.Application.Appointments.Dtos
 {
     public record AppointmentDto
     {
