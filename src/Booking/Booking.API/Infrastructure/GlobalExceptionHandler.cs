@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Booking.Application.Common.Exceptions;
+using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
@@ -35,6 +36,23 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
 
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             context.Response.ContentType = MediaTypeNames.Application.Json; 
+
+            await context.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+
+            return true;
+        }
+
+        if (exception is NotFoundException NotFoundException)
+        {
+
+            var problemDetails = new ProblemDetails
+            {
+                Status = StatusCodes.Status404NotFound,
+                Title = "Not Found",
+                Detail = exception.Message
+            };
+
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
 
             await context.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
 

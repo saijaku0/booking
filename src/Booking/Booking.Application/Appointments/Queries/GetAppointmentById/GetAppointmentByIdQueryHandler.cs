@@ -1,4 +1,5 @@
-﻿using Booking.Application.Common.Interfaces;
+﻿using Booking.Application.Common.Exceptions;
+using Booking.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,7 +24,7 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentById
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (appoinment == null) 
-                throw new InvalidOperationException($"Not found {request.Id}");
+                throw new NotFoundException(nameof(appoinment), request.Id);
 
             return appoinment;
         }
