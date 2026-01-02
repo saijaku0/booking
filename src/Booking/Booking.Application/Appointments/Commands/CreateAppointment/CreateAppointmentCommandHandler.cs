@@ -1,4 +1,5 @@
-﻿using Booking.Application.Common.Interfaces;
+﻿using Booking.Application.Common.Extension;
+using Booking.Application.Common.Interfaces;
 using Booking.Domain.Entities;
 using FluentValidation;
 using MediatR;
@@ -13,13 +14,10 @@ namespace Booking.Application.Appointments.Commands.CreateAppointment
         public async Task<Guid> Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
         {
             var isOverLap = await _context.Appointments
-                .AnyAsync(x =>
-                    x.ResourceId == request.ResourceId
-                        &&
-                    request.StartTime < x.EndTime
-                        &&
-                    request.EndTime > x.StartTime,
-                    cancellationToken);
+                .WhereOverlaps(request.ResourceId,
+                    request.StartTime,
+                    request.EndTime)
+                .AnyAsync(cancellationToken);
 
             if (isOverLap)
             {

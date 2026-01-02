@@ -2,6 +2,7 @@
 using Booking.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Booking.Application.Common.Extension;
 
 namespace Booking.Application.Appointments.Queries.GetAppointmentsByDate
 {
@@ -13,12 +14,9 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentsByDate
         public async Task<List<AppointmentDto>> Handle(GetAppointmentsByDateQuery request, CancellationToken cancellationToken)
         {
             var getDateAppoinment = await _context.Appointments
-                .Where(x =>
-                    x.ResourceId == request.ResourceId
-                        &&
-                    request.StartTime < x.EndTime
-                        &&
-                    request.EndTime > x.StartTime)
+                .WhereOverlaps(request.ResourceId,
+                    request.StartTime,
+                    request.EndTime)
                 .Select(a => new AppointmentDto
                 {
                     Id = a.Id,
