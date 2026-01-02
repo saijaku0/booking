@@ -1,4 +1,4 @@
-﻿using Booking.Application.Appointments.Queries.GetAppointmentById;
+﻿using Booking.Application.Appointments.Dtos;
 using MediatR;
 
 namespace Booking.Application.Appointments.Queries.GetAppointmentsByDate
