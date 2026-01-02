@@ -1,4 +1,4 @@
-﻿using Booking.Application.Appointments.Queries.GetAppointmentById;
+﻿using Booking.Application.Appointments.Dtos;
 using Booking.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
