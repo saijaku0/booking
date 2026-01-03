@@ -1,10 +1,12 @@
 using Booking.Application.Common.Interfaces;
 using Booking.Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Booking.Infrastructure.Persistence;
 
-public class BookingDbContext(DbContextOptions<BookingDbContext> options) : DbContext(options), IBookingDbContext
+public class BookingDbContext(DbContextOptions<BookingDbContext> options) 
+    : IdentityDbContext<ApplicationUser>(options), IBookingDbContext
 {
     public DbSet<Appointment> Appointments { get; set; }
 
