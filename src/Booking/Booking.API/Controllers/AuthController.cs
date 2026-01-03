@@ -1,4 +1,5 @@
-﻿using Booking.Application.Identity.Commands.RegisterUser;
+﻿using Booking.Application.Identity.Commands.LoginUser;
+using Booking.Application.Identity.Commands.RegisterUser;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,6 +29,23 @@ namespace Booking.API.Controllers
             var userId = await _mediator.Send(registerUserCommand);
 
             return Ok(new { UserId = userId});
+        }
+
+        /// <summary>
+        /// Sign in (get token)
+        /// </summary>
+        /// <param name="command">Email and password</param>
+        /// <returns>JWT token for access</returns>
+        /// <response code="200">Login is success</response>
+        /// <response code="400">Errore invalid email or password</response>
+        [HttpPost("login")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Login([FromBody] LoginUserCommand command)
+        {
+            var token = await _mediator.Send(command);
+
+            return Ok(new { Token = token });
         }
     }
 }
