@@ -9,6 +9,7 @@ public class BookingDbContext(DbContextOptions<BookingDbContext> options)
     : IdentityDbContext<ApplicationUser>(options), IBookingDbContext
 {
     public DbSet<Appointment> Appointments { get; set; }
+    public DbSet<Doctor> Doctors { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -19,7 +20,7 @@ public class BookingDbContext(DbContextOptions<BookingDbContext> options)
             builder.Property(a => a.Status)
                 .HasConversion<string>();
 
-            builder.Property(a => a.ResourceId).IsRequired();
+            builder.Property(a => a.DoctorId).IsRequired();
             builder.Property(a => a.CustomerId).IsRequired();
         });
 

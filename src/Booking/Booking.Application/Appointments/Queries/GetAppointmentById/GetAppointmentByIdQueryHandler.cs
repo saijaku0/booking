@@ -17,7 +17,7 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentById
                 .Select(a => new AppointmentDto
                 {
                     Id = a.Id,
-                    ResourceId = a.ResourceId,
+                    DoctorId = a.DoctorId,
                     CustomerId = a.CustomerId,
                     StartTime = a.StartTime,
                     EndTime = a.EndTime

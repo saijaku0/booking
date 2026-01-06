@@ -17,11 +17,14 @@ namespace Booking.Infrastructure
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
             services.AddDbContext<BookingDbContext>(options =>
-            options.UseNpgsql(connectionString));
+                options.UseNpgsql(connectionString));
 
             services.AddScoped<IBookingDbContext>(provider => provider.GetRequiredService<BookingDbContext>());
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
 
             services.AddTransient<ITokenService, TokenService>();
+
+            services.AddHttpContextAccessor();
 
             services.AddAuthentication(options =>
             {
