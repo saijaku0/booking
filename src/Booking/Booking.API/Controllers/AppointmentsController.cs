@@ -78,12 +78,17 @@ namespace Booking.API.Controllers
             return Ok(getAppointmentsDate);
         }
 
-        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
         [Authorize(Roles = "doctor")]
         [HttpGet("me")]
         public async Task<ActionResult<List<AppointmentDto>>> GetDoctorAppointmentsQuery(
-            [FromQuery] DateTime start,
-            [FromQuery] DateTime end)
+            [FromQuery] DateTime? start,
+            [FromQuery] DateTime? end)
         {
             var getAppointments = await _mediator.Send(new GetDoctorAppointmentsQuery
             {

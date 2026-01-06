@@ -26,15 +26,23 @@ namespace Booking.Application.Appointments.Queries.GetDoctorAppointments
                 .FirstOrDefaultAsync(d => d.UserId == currentUserId, cancellationToken) ?? 
                 throw new UnauthorizedAccessException("Current user is not a registered doctor.");
 
-            var appointments = await _context.Appointments
-                .Where(d => d.DoctorId == doctor.Id)
-                .Where(a => a.StartTime >= request.Start 
-                        && 
-                    a.EndTime <= request.End)
+            var query = _context.Appointments
+                .AsNoTracking()
+                .Where(a => a.DoctorId == doctor.Id);
+
+            if (request.Start.HasValue)
+                query = query.Where(a => a.StartTime >= request.Start.Value);
+
+            if (request.End.HasValue)
+                query = query.Where(a => a.EndTime <= request.End.Value);
+
+            var appointments = await query
+                .OrderBy(a => a.StartTime)
                 .Select(a => new AppointmentDto
                 {
                     Id = a.Id,
                     DoctorId = a.DoctorId,
+                    CustomerId = a.CustomerId,
                     StartTime = a.StartTime,
                     EndTime = a.EndTime
                 })

@@ -33,8 +33,8 @@ namespace Booking.Application.Appointments.Commands.CreateAppointment
                 throw new UnauthorizedAccessException("User ID is invalid or missing.");
 
             Appointment appointment = new(
-                userId,
                 request.DoctorId,
+                userId,
                 request.StartTime,
                 request.EndTime
             );

@@ -12,14 +12,19 @@ namespace Booking.Infrastructure.Identity
     {
         private readonly IConfiguration _configuration = configuration;
 
-        public string GenerateToken(ApplicationUser applicationUser)
+        public string GenerateToken(
+            ApplicationUser applicationUser,
+            IList<string> roles)
         {
             var claims = new List<Claim>
             {
                 new(JwtRegisteredClaimNames.Sub, applicationUser.Id),
                 new(JwtRegisteredClaimNames.Email, applicationUser.Email!),
-                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),       
             };
+
+            foreach (string role in roles)        
+                claims.Add(new(ClaimTypes.Role, role));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Secret"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
