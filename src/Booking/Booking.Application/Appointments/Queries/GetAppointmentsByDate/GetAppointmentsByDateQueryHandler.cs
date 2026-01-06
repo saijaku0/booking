@@ -14,7 +14,7 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentsByDate
         public async Task<List<AppointmentDto>> Handle(GetAppointmentsByDateQuery request, CancellationToken cancellationToken)
         {
             var getDateAppoinment = await _context.Appointments
-                .WhereOverlaps(request.ResourceId,
+                .WhereOverlaps(request.DoctorId,
                     request.StartTime,
                     request.EndTime)
                 .Select(a => new AppointmentDto

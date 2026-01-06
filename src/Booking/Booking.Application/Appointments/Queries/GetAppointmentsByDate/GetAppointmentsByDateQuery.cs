@@ -5,7 +5,7 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentsByDate
 {
     public record GetAppointmentsByDateQuery : IRequest<List<AppointmentDto>>
     {
-        public Guid ResourceId { get; init; }
+        public Guid DoctorId { get; init; }
         public DateTime StartTime { get; init; }
         public DateTime EndTime { get; init; }
     }

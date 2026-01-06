@@ -6,7 +6,7 @@ namespace Booking.Application.Appointments.Commands.CreateAppointment
     {
         public CreateAppointmentCommandValidator() 
         {
-            RuleFor(v => v.ResourceId)
+            RuleFor(v => v.DoctorId)
                 .NotEmpty().WithMessage("Enter resorce ID");
 
             RuleFor(v => v.StartTime)

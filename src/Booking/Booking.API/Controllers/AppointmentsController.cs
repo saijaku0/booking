@@ -2,6 +2,7 @@
 using Booking.Application.Appointments.Dtos;
 using Booking.Application.Appointments.Queries.GetAppointmentById;
 using Booking.Application.Appointments.Queries.GetAppointmentsByDate;
+using Booking.Application.Appointments.Queries.GetDoctorAppointments;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -54,27 +55,43 @@ namespace Booking.API.Controllers
         /// Get reservation list by appointment period
         /// </summary>
         /// <remarks>
-        /// Allows you to filter reservations by a specific room (resourceId) or get a general schedule.
+        /// Allows you to filter reservations by a specific room (doctorId) or get a general schedule.
         /// </remarks>
-        /// <param name="resourceId">ID (can be null)</param>
+        /// <param name="doctorId">ID (can be null)</param>
         /// <param name="start">sart of a period</param>
         /// <param name="end">end of a period</param>
         /// <returns>List of booking</returns>
         /// <response code="200">Successful request. Returns a list (may be empty)</response>
         [HttpGet]
         public async Task<ActionResult<List<AppointmentDto>>> GetAppointmentsByDateQuery(
-            [FromQuery] Guid resourceId,
+            [FromQuery] Guid doctorId,
             [FromQuery] DateTime start, 
             [FromQuery] DateTime end)
         {
             var getAppointmentsDate = await _mediator.Send(new GetAppointmentsByDateQuery
             {
-                ResourceId = resourceId,
+                DoctorId = doctorId,
                 StartTime = start,
                 EndTime = end
             });
 
             return Ok(getAppointmentsDate);
+        }
+
+        
+        [Authorize(Roles = "doctor")]
+        [HttpGet("me")]
+        public async Task<ActionResult<List<AppointmentDto>>> GetDoctorAppointmentsQuery(
+            [FromQuery] DateTime start,
+            [FromQuery] DateTime end)
+        {
+            var getAppointments = await _mediator.Send(new GetDoctorAppointmentsQuery
+            {
+                Start = start,
+                End = end
+            });
+
+            return Ok(getAppointments);
         }
     }
 }

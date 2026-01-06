@@ -1,8 +1,7 @@
-﻿namespace Booking.Domain.Entities
+﻿namespace Booking.Application.Appointments.Dtos
 {
-    public class Doctor
+    public class DoctorDto
     {
-        public Guid Id { get; init; }
         public string? UserId { get; init; } = null;
         public string Name { get; set; } = string.Empty;
         public string Specialty { get; set; } = string.Empty;
