@@ -106,11 +106,11 @@ namespace Booking.Infrastructure.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("DoctorId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("ResourceId")
-                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("timestamp with time zone");
@@ -122,6 +122,25 @@ namespace Booking.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Appointments");
+                });
+
+            modelBuilder.Entity("Booking.Domain.Entities.Doctor", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Specialty")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Doctors");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

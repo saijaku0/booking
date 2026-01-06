@@ -3,7 +3,7 @@
 namespace Booking.Application.Appointments.Commands.CreateAppointment
 {
     public record CreateAppointmentCommand(
-            Guid ResourceId,
+            Guid DoctorId,
             DateTime StartTime,
             DateTime EndTime
         ) : IRequest<Guid>;

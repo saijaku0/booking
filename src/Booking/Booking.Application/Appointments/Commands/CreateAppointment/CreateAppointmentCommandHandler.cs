@@ -16,7 +16,7 @@ namespace Booking.Application.Appointments.Commands.CreateAppointment
         public async Task<Guid> Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
         {
             var isOverLap = await _context.Appointments
-                .WhereOverlaps(request.ResourceId,
+                .WhereOverlaps(request.DoctorId,
                     request.StartTime,
                     request.EndTime)
                 .AnyAsync(cancellationToken);
@@ -34,7 +34,7 @@ namespace Booking.Application.Appointments.Commands.CreateAppointment
 
             Appointment appointment = new(
                 userId,
-                request.ResourceId,
+                request.DoctorId,
                 request.StartTime,
                 request.EndTime
             );

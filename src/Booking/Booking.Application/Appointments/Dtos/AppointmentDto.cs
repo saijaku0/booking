@@ -10,9 +10,9 @@
         /// </summary>
         public Guid Id { get; init; }
         /// <summary>
-        /// Resource ID(meeting room/office)
+        /// Doctor ID
         /// </summary>
-        public Guid ResourceId { get; init; }
+        public Guid DoctorId { get; init; }
         /// <summary>
         /// ID of the client who made the reservation
         /// </summary>
