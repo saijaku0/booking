@@ -3,6 +3,7 @@ using Booking.Application.Appointments.Dtos;
 using Booking.Application.Appointments.Queries.GetAppointmentById;
 using Booking.Application.Appointments.Queries.GetAppointmentsByDate;
 using Booking.Application.Appointments.Queries.GetDoctorAppointments;
+using Booking.Domain.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -79,12 +80,20 @@ namespace Booking.API.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Retrieves the personal schedule for the currently logged-in doctor.
         /// </summary>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
-        /// <returns></returns>
-        [Authorize(Roles = "doctor")]
+        /// <remarks>
+        /// This endpoint is restricted to users with the 'doctor' role.
+        /// It automatically identifies the doctor based on the authentication token.
+        /// If date parameters are omitted, returns all appointments.
+        /// </remarks>
+        /// <param name="start">Optional start date filter (UTC). If null, includes appointments from the beginning of time.</param>
+        /// <param name="end">Optional end date filter (UTC). If null, includes appointments up to the end of time.</param>
+        /// <returns>A list of appointments belonging to the current doctor</returns>
+        /// <response code="200">Returns the list of appointments (can be empty).</response>
+        /// <response code="401">User is not authorized.</response>
+        /// <response code="403">User is authorized but does not have the 'doctor' role.</response>
+        [Authorize(Roles = Roles.Doctor)]
         [HttpGet("me")]
         public async Task<ActionResult<List<AppointmentDto>>> GetDoctorAppointmentsQuery(
             [FromQuery] DateTime? start,
