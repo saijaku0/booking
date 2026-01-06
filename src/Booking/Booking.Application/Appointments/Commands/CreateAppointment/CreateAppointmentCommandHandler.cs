@@ -7,9 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Booking.Application.Appointments.Commands.CreateAppointment
 {
-    public class CreateAppointmentCommandHandler(IBookingDbContext context) : IRequestHandler<CreateAppointmentCommand, Guid>
+    public class CreateAppointmentCommandHandler(IBookingDbContext context, ICurrentUserService currentUserService) 
+        : IRequestHandler<CreateAppointmentCommand, Guid>
     {
         private readonly IBookingDbContext _context = context;
+        private readonly ICurrentUserService _currentUserService = currentUserService;
 
         public async Task<Guid> Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
         {
@@ -25,8 +27,13 @@ namespace Booking.Application.Appointments.Commands.CreateAppointment
                 throw new ValidationException([failure]);
             }
 
+            var userId = Guid.Parse(_currentUserService.UserId);
+
+            if (userId == Guid.Empty)
+                throw new UnauthorizedAccessException("User ID is invalid or missing.");
+
             Appointment appointment = new(
-                request.CustomerId,
+                userId,
                 request.ResourceId,
                 request.StartTime,
                 request.EndTime
