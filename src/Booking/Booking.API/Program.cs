@@ -21,8 +21,6 @@ builder.Services.AddOpenApi(options =>
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
-builder.Services.GetServiceCollection(builder.Configuration);
-
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
         options.Password.RequireDigit = false;
@@ -31,6 +29,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     })
     .AddEntityFrameworkStores<BookingDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.GetServiceCollection(builder.Configuration);
 
 builder.Services.AddValidatorsFromAssembly(typeof(CreateAppointmentCommand).Assembly);
 

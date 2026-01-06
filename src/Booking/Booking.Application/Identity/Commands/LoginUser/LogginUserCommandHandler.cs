@@ -21,10 +21,10 @@ public class LoginUserCommandHandler(
 
         if (user == null)
         {
-            throw new ValidationException(new[]
-            {
+            throw new ValidationException(
+            [
                 new ValidationFailure("Login", "Invalid email")
-            });
+            ]);
         }
 
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
@@ -37,7 +37,9 @@ public class LoginUserCommandHandler(
             });
         }
 
-        var token = _tokenService.GenerateToken(user);
+        var roles = await _userManager.GetRolesAsync(user);
+
+        var token = _tokenService.GenerateToken(user, roles);
 
         return token;
     }
