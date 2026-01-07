@@ -1,18 +1,17 @@
-name: .NET CI & Auto-Merge
+name: .NET CI
 
 on:
   push:
-    branches: [ "feature/*", "refactor/*", "test/*"]
+    branches: [ "feature/*", "refactor/*", "test/*", "chore/*", "docs/*"]
   pull_request:
     branches: [ "develop" ]
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
     services:
       postgres:
         image: postgres:16-alpine
@@ -28,10 +27,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-    strategy:
-      matrix:
-        dotnet-version: ["8.0.x", "9.0.x", "10.0.x"]
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -39,36 +34,15 @@ jobs:
       - name: Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}
+          dotnet-version: "10.0.x"
 
       - name: Install dependencies
         run: dotnet restore
 
-      - name: Test with dotnet
+      - name: Build with dotnet
         run: dotnet build --no-restore --configuration Release
 
-      - name: Upload dotnet test results
+      - name: Run Integration Tests
         run: dotnet test --no-build --configuration Release --logger trx --results-directory "TestResults"
         env: 
           ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=booking_db;Username=booking_admin;Password=SecretSuperPassword"
-
-  merge-to-develop:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref != 'refs/heads/develop'
-    steps: 
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Merge changes to develop
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          
-          git fetch origin develop
-          git checkout develop
-          git merge ${{ github.sha }} --no-edit
-          
-          git push origin develop
