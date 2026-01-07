@@ -11,6 +11,7 @@ namespace Booking.Application.Identity.Commands.RegisterUser
     {
         private readonly UserManager<ApplicationUser> _user = user;
 
+        //Refactor this...
         public async Task<string> Handle(
             RegisterUserCommand request, 
             CancellationToken cancellationToken)
