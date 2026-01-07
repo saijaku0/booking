@@ -15,30 +15,24 @@ public class LoginUserCommandHandler(
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly ITokenService _tokenService = tokenService;
 
-    public async Task<string> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+    public async Task<string> Handle(
+        LoginUserCommand request, 
+        CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
 
-        if (user == null)
+        bool isPasswordValid = user != null 
+            && await _userManager.CheckPasswordAsync(user, request.Password);
+
+        if (user == null || !isPasswordValid)
         {
             throw new ValidationException(
             [
-                new ValidationFailure("Login", "Invalid email")
+                new ValidationFailure("Login", "Invalid email or password")
             ]);
         }
 
-        var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
-
-        if (!isPasswordValid)
-        {
-            throw new ValidationException(new[]
-            {
-                new ValidationFailure("Login", "Invalid password")
-            });
-        }
-
         var roles = await _userManager.GetRolesAsync(user);
-
         var token = _tokenService.GenerateToken(user, roles);
 
         return token;

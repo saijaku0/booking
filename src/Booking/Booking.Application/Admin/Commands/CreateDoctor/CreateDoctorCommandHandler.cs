@@ -1,7 +1,7 @@
-﻿using Booking.Application.Common.Interfaces;
+﻿using Booking.Application.Common.Exceptions;
+using Booking.Application.Common.Interfaces;
 using Booking.Domain.Constants;
 using Booking.Domain.Entities;
-using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -28,26 +28,11 @@ namespace Booking.Application.Admin.Commands.CreateDoctor
                 EmailConfirmed = true,
             };
 
-            var createUser = await _userManager
-                .CreateAsync(user, createDoctor.Password);
+            (await _userManager.CreateAsync(user, createDoctor.Password))
+                .EnsureSucceeded("CreateDoctor");
 
-            if (!createUser.Succeeded)
-            {
-                var errors = createUser.Errors.Select(e =>
-                    new FluentValidation.Results.ValidationFailure("CreateUser", e.Description));
-
-                throw new ValidationException(errors);
-            }
-
-            var roleResult = await _userManager
-                .AddToRoleAsync(user, Roles.Doctor);
-
-            if (!roleResult.Succeeded)
-            {
-                var errors = roleResult.Errors.Select(e =>
-                    new FluentValidation.Results.ValidationFailure("AddRole", e.Description));
-                throw new ValidationException(errors);
-            }
+            (await _userManager.AddToRoleAsync(user, Roles.Doctor))
+                .EnsureSucceeded("AddRole");
 
             var doctor = new Doctor
             {
