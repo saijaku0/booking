@@ -1,7 +1,8 @@
 ﻿using Booking.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using FluentValidation;
+using Booking.Domain.Constants;
+using Booking.Application.Common.Exceptions;
 
 namespace Booking.Application.Identity.Commands.RegisterUser
 {
@@ -10,7 +11,10 @@ namespace Booking.Application.Identity.Commands.RegisterUser
     {
         private readonly UserManager<ApplicationUser> _user = user;
 
-        public async Task<string> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+        //Refactor this...
+        public async Task<string> Handle(
+            RegisterUserCommand request, 
+            CancellationToken cancellationToken)
         {
             var user = new ApplicationUser
             {
@@ -20,17 +24,13 @@ namespace Booking.Application.Identity.Commands.RegisterUser
                 UserName = request.UserEmail,
             };
 
-            var result = await _user.CreateAsync(user, request.UserPassword);
+            (await _user.CreateAsync(user, request.UserPassword))
+                .EnsureSucceeded("Registration");
 
-            if (!result.Succeeded)
-            {
-                var errors = result.Errors.Select(e => 
-                    new FluentValidation.Results.ValidationFailure("Registration", e.Description));
+            (await _user.AddToRoleAsync(user, Roles.Patient))
+                .EnsureSucceeded("RoleAssignment");
 
-                throw new ValidationException(errors);
-            }
-
-                return user.Id;
+            return user.Id;
         }
     }
 }
