@@ -1,4 +1,5 @@
-﻿using Booking.Application.Appointments.Commands.CreateAppointment;
+﻿using Booking.Application.Appointments.Commands.CancelAppointment;
+using Booking.Application.Appointments.Commands.CreateAppointment;
 using Booking.Application.Appointments.Dtos;
 using Booking.Application.Appointments.Queries.GetAppointmentById;
 using Booking.Application.Appointments.Queries.GetAppointmentsByDate;
@@ -106,6 +107,27 @@ namespace Booking.API.Controllers
             });
 
             return Ok(getAppointments);
+        }
+
+        /// <summary>
+        /// Cancels an existing appointment.
+        /// </summary>
+        /// <remarks>
+        /// - Patients can cancel only their own appointments.
+        /// - Doctors can cancel appointments only in their schedule.
+        /// - Admins can cancel any appointment.
+        /// </remarks>
+        /// <param name="id">Appointment ID</param>
+        /// <response code="204">Success (No Content)</response>
+        /// <response code="403">Forbidden (Trying to cancel someone else's booking)</response>
+        /// <response code="404">Appointment not found</response>
+        [HttpDelete("{id:guid}")]
+        [Authorize] 
+        public async Task<IActionResult> CancelAppointment(Guid id)
+        {
+            await _mediator.Send(new CancelAppointmentCommand(id));
+
+            return NoContent(); 
         }
     }
 }
