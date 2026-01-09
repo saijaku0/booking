@@ -1,9 +1,10 @@
-﻿namespace Booking.Application.Appointments.Dtos
+﻿namespace Booking.Application.Doctor.Dtos
 {
     public class DoctorDto
     {
-        public string? UserId { get; init; } = null;
+        public Guid Id { get; init; }
         public string Name { get; set; } = string.Empty;
+        public string Lastname { get; set; } = string.Empty;
         public string Specialty { get; set; } = string.Empty;
     }
 }
