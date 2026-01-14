@@ -35,13 +35,12 @@ namespace Booking.Application.Admin.Commands.CreateDoctor
                 .EnsureSucceeded("AddRole");
 
             var doctor = new Doctor
-            {
-                Id = Guid.NewGuid(),
-                UserId = user.Id,
-                Name = createDoctor.Name,
-                Lastname = createDoctor.Lastname,
-                Specialty = createDoctor.Specialty,
-            };
+            (
+                user.Id,
+                createDoctor.Name,
+                createDoctor.Lastname,
+                createDoctor.Specialty
+            );
 
             _dbContext.Doctors.Add(doctor);
             await _dbContext.SaveChangesAsync(cancellationToken);

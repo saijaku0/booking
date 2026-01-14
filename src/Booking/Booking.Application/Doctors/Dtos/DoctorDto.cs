@@ -1,4 +1,4 @@
-﻿namespace Booking.Application.Doctor.Dtos
+﻿namespace Booking.Application.Doctors.Dtos
 {
     public class DoctorDto
     {

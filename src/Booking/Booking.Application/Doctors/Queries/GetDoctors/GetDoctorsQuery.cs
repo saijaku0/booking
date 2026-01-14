@@ -1,7 +1,7 @@
-﻿using Booking.Application.Doctor.Dtos;
+﻿using Booking.Application.Doctors.Dtos;
 using MediatR;
 
-namespace Booking.Application.Doctor.Queries.GetDoctors
+namespace Booking.Application.Doctors.Queries.GetDoctors
 {
     public class GetDoctorsQuery(string? searchTerm = null, string? specialty = null)
                 : IRequest<List<DoctorDto>>
