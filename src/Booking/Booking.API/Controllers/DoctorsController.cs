@@ -1,5 +1,5 @@
-﻿using Booking.Application.Doctor.Dtos;
-using Booking.Application.Doctor.Queries.GetDoctors;
+﻿using Booking.Application.Doctors.Dtos;
+using Booking.Application.Doctors.Queries.GetDoctors;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
