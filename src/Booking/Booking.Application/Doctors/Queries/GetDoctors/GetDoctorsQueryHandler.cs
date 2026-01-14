@@ -1,10 +1,9 @@
 ﻿using Booking.Application.Common.Interfaces;
-using Booking.Application.Doctor.Dtos;
+using Booking.Application.Doctors.Dtos;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
-namespace Booking.Application.Doctor.Queries.GetDoctors
+namespace Booking.Application.Doctors.Queries.GetDoctors
 {
     public class GetDoctorsQueryHandler(IBookingDbContext context) 
         : IRequestHandler<GetDoctorsQuery, List<DoctorDto>>
