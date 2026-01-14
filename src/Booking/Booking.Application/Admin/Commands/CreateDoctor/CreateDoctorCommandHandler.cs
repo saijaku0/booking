@@ -36,10 +36,11 @@ namespace Booking.Application.Admin.Commands.CreateDoctor
 
             var doctor = new Doctor
             (
-                user.Id,
                 createDoctor.Name,
                 createDoctor.Lastname,
-                createDoctor.Specialty
+                createDoctor.Specialty,
+                true,
+                user.Id
             );
 
             _dbContext.Doctors.Add(doctor);

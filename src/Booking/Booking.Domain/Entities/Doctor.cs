@@ -22,7 +22,8 @@ public class Doctor
     public Doctor(
         string name, 
         string lastname, 
-        string specialty, 
+        string specialty,
+        bool isActive,
         string? userId = null)
     {
         Id = Guid.NewGuid();
@@ -30,6 +31,7 @@ public class Doctor
         Lastname = lastname;
         Specialty = specialty;
         UserId = userId;
+        IsActive = isActive;
     }
 
     public void UpdateProfile(
