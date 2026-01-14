@@ -39,7 +39,7 @@ namespace Booking.Application.Admin.Commands.CreateDoctor
                 createDoctor.Name,
                 createDoctor.Lastname,
                 createDoctor.Specialty,
-                true,
+                createDoctor.IsActive,
                 user.Id
             );
 
