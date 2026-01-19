@@ -56,5 +56,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseMiddleware<Booking.API.Middleware.ApiKeyMiddleware>();
+
 app.MapControllers();
 app.Run();
