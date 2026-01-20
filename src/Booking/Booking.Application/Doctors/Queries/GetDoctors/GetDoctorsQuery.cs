@@ -3,10 +3,10 @@ using MediatR;
 
 namespace Booking.Application.Doctors.Queries.GetDoctors
 {
-    public class GetDoctorsQuery(string? searchTerm = null, string? specialty = null)
+    public class GetDoctorsQuery
                 : IRequest<List<DoctorDto>>
     {
-        public string? SearchTerm { get; set; } = searchTerm;
-        public string? Specialty { get; set; } = specialty;
+        public string? SearchTerm { get; init; }
+        public string? Specialty { get; init; }
     }
 }
