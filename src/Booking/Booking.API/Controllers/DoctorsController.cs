@@ -2,6 +2,7 @@
 using Booking.Application.Doctors.Dtos;
 using Booking.Application.Doctors.Queries.GetDoctors;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Booking.API.Controllers
@@ -19,6 +20,7 @@ namespace Booking.API.Controllers
         /// <param name="getDoctors">Filter parameters (search term, specialty)</param>
         /// <returns>List of doctors</returns>
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<List<DoctorDto>>> GetListDoctors(
             [FromQuery] GetDoctorsQuery getDoctors)
         {
