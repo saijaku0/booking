@@ -18,5 +18,12 @@ namespace Booking.API.Controllers
         {
             return await _mediator.Send(new GetSpecialtiesQuery());
         }
+
+        [HttpGet("{id}")] 
+        [AllowAnonymous] 
+        public async Task<ActionResult<SpecialtyDto>> GetById(Guid id)
+        {
+            return await _mediator.Send(new GetSpecialtyByIdQuery(id));
+        }
     }
 }
