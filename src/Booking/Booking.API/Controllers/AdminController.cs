@@ -1,8 +1,10 @@
 ﻿using Booking.Application.Admin.Commands.CreateDoctor;
+using Booking.Application.Admin.Commands.CreateSpecialty;
 using Booking.Domain.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Booking.API.Controllers
 {
@@ -32,5 +34,13 @@ namespace Booking.API.Controllers
 
         //    return Ok(appointment);
         //}
+
+        [Authorize(Roles = Roles.Admin)]
+        [HttpPost("specialties")]
+        public async Task<ActionResult<Guid>> CreateSpecialty(
+            CreateSpecialtyCommand createSpecialty)
+        {
+            return await _mediator.Send(createSpecialty);
+        }
     }
 }
