@@ -18,8 +18,8 @@ namespace Booking.Application.Doctors.Queries.GetDoctors
                 .AsNoTracking()
                 .AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(getDoctorsQuery.Specialty))
-                query = query.Where(d => d.Specialty == getDoctorsQuery.Specialty);
+            if (getDoctorsQuery.SpecialtyId.HasValue)
+                query = query.Where(d => d.SpecialtyId == getDoctorsQuery.SpecialtyId.Value);
 
             if (!string.IsNullOrWhiteSpace(getDoctorsQuery.SearchTerm))
             {
@@ -36,7 +36,8 @@ namespace Booking.Application.Doctors.Queries.GetDoctors
                     Id = d.Id,
                     Name = d.Name,
                     Lastname = d.Lastname,
-                    Specialty = d.Specialty,
+                    SpecialtyId = d.SpecialtyId,
+                    SpecialtyName = d.Specialty != null ? d.Specialty.Name : string.Empty
                 })
                 .ToListAsync(cancellationToken);
         }
