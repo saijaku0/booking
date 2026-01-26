@@ -8,7 +8,8 @@ public class Doctor
     public string? UserId { get; init; } = null;
     public string Name { get; private set; } = string.Empty;
     public string Lastname {  get; private set; } = string.Empty;
-    public string Specialty { get; private set; } = string.Empty;
+    public Guid SpecialtyId { get; private set; }
+    public Specialty Specialty { get; private set; } = null!;
     public string? Bio { get; private set; }
     public int ExperienceYears { get; private set; }
     public string? ImageUrl { get; private set; }
@@ -21,14 +22,14 @@ public class Doctor
     public Doctor(
         string name, 
         string lastname, 
-        string specialty,
+        Guid specialtyId,
         bool isActive,
         string? userId = null)
     {
         Id = Guid.NewGuid();
         Name = name;
         Lastname = lastname;
-        Specialty = specialty;
+        SpecialtyId = specialtyId;
         UserId = userId;
         IsActive = isActive;
     }
@@ -58,11 +59,11 @@ public class Doctor
 
     public string GetFullName() => $"{Name} {Lastname}";
     
-    public void SetSpecialty(string specialty)
+    public void SetSpecialty(Guid specialtyId)
     {
-        if (string.IsNullOrWhiteSpace(specialty))
-            throw new ArgumentException("Specialty cannot be empty");
-        Specialty = specialty;
+        if (specialtyId == Guid.Empty)
+            throw new ArgumentException("Specialty ID cannot be empty");
+        SpecialtyId = specialtyId;
     }
 
     public void SetImageUrl(string imageUrl)
