@@ -7,6 +7,6 @@ namespace Booking.Application.Doctors.Queries.GetDoctors
                 : IRequest<List<DoctorDto>>
     {
         public string? SearchTerm { get; init; }
-        public string? Specialty { get; init; }
+        public Guid? SpecialtyId { get; init; }
     }
 }

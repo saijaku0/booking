@@ -38,7 +38,7 @@ namespace Booking.Application.Admin.Commands.CreateDoctor
             (
                 createDoctor.Name,
                 createDoctor.Lastname,
-                createDoctor.Specialty,
+                createDoctor.SpecialtyId,
                 createDoctor.IsActive,
                 user.Id
             );

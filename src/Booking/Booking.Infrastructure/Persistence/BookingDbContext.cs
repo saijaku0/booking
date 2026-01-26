@@ -10,6 +10,7 @@ public class BookingDbContext(DbContextOptions<BookingDbContext> options)
 {
     public DbSet<Appointment> Appointments { get; set; }
     public DbSet<Doctor> Doctors { get; set; }
+    public DbSet<Specialty> Specialties { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -9,7 +9,7 @@ namespace Booking.Application.Admin.Commands.CreateDoctor
         public string Password {  get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string Lastname {  get; set; } = string.Empty;
-        public string Specialty {  get; set; } = string.Empty;
+        public Guid SpecialtyId {  get; set; }
         public bool IsActive { get; set; }
     }
 }
