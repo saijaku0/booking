@@ -4,6 +4,7 @@ using Booking.Application.Appointments.Dtos;
 using Booking.Application.Appointments.Queries.GetAppointmentById;
 using Booking.Application.Appointments.Queries.GetAppointmentsByDate;
 using Booking.Application.Appointments.Queries.GetDoctorAppointments;
+using Booking.Application.Appointments.Queries.GetDoctorAvailability;
 using Booking.Domain.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -128,6 +129,21 @@ namespace Booking.API.Controllers
             await _mediator.Send(new CancelAppointmentCommand(id));
 
             return NoContent(); 
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="doctorId"></param>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        [HttpGet("availability")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<TimeSlotDto>>> GetAvailability(
+            [FromQuery] Guid doctorId,
+            [FromQuery] DateTime date)
+        {
+            return await _mediator.Send(new GetDoctorAvailabilityQuery(doctorId, date));
         }
     }
 }
