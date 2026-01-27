@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11415.281 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{84875C56-7590-4585-983F-078DD7263E15}"
 EndProject
@@ -15,13 +15,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Booking.Infrastructure", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Booking.API", "src\Booking\Booking.API\Booking.API.csproj", "{555FBA86-9C27-4EB3-B895-D9F3B35DC5F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tests", "tests\tests.csproj", "{84329AD6-BF0D-4391-96A1-073DAB3F70B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{306CA690-4DFD-48E1-A066-1918FD085FA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -40,6 +39,13 @@ Global
 		{555FBA86-9C27-4EB3-B895-D9F3B35DC5F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{555FBA86-9C27-4EB3-B895-D9F3B35DC5F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{555FBA86-9C27-4EB3-B895-D9F3B35DC5F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84329AD6-BF0D-4391-96A1-073DAB3F70B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84329AD6-BF0D-4391-96A1-073DAB3F70B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84329AD6-BF0D-4391-96A1-073DAB3F70B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84329AD6-BF0D-4391-96A1-073DAB3F70B3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9F3B7DBC-79B4-44F8-9059-FD5EE41932EF} = {84875C56-7590-4585-983F-078DD7263E15}
@@ -47,5 +53,8 @@ Global
 		{512F7C75-A949-49E3-8CAF-3598B05CCAD6} = {9F3B7DBC-79B4-44F8-9059-FD5EE41932EF}
 		{14408A98-8E28-4AD5-A75D-5BF85DBF3E0F} = {9F3B7DBC-79B4-44F8-9059-FD5EE41932EF}
 		{555FBA86-9C27-4EB3-B895-D9F3B35DC5F3} = {9F3B7DBC-79B4-44F8-9059-FD5EE41932EF}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1D1FFFB3-0AB4-4658-80FF-35994DC8C0AB}
 	EndGlobalSection
 EndGlobal
