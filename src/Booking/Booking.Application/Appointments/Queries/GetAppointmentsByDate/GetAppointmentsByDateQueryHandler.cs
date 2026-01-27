@@ -1,8 +1,9 @@
 ﻿using Booking.Application.Appointments.Dtos;
+using Booking.Application.Common.Extension;
 using Booking.Application.Common.Interfaces;
+using Booking.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Booking.Application.Common.Extension;
 
 namespace Booking.Application.Appointments.Queries.GetAppointmentsByDate
 {
@@ -14,6 +15,7 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentsByDate
         public async Task<List<AppointmentDto>> Handle(GetAppointmentsByDateQuery request, CancellationToken cancellationToken)
         {
             var getDateAppoinment = await _context.Appointments
+                .Where(a => a.Status != AppointmentStatus.Canceled)
                 .WhereOverlaps(request.DoctorId,
                     request.StartTime,
                     request.EndTime)
