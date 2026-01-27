@@ -10,6 +10,8 @@ public class Doctor
     public string Lastname {  get; private set; } = string.Empty;
     public Guid SpecialtyId { get; private set; }
     public Specialty Specialty { get; private set; } = null!;
+    public double AverageRating { get; private set; }
+    public int ReviewsCount { get; private set; }
     public string? Bio { get; private set; }
     public int ExperienceYears { get; private set; }
     public string? ImageUrl { get; private set; }
@@ -55,6 +57,18 @@ public class Doctor
         ImageUrl = imageUrl;
         IsActive = isActive;
         ConsultationFee = consultationFee;
+    }
+
+    public void AddReview(double rating)
+    {
+        if (rating < 0 || rating > 5) 
+            throw new ArgumentException("Rating must be between 0 and 5");
+        double totalScore = AverageRating * ReviewsCount;
+        totalScore += rating;
+
+        ReviewsCount++;
+
+        AverageRating = Math.Round(totalScore / ReviewsCount, 2);
     }
 
     public string GetFullName() => $"{Name} {Lastname}";
