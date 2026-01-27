@@ -6,6 +6,8 @@
         public string Name { get; set; } = string.Empty;
         public string Lastname { get; set; } = string.Empty;
         public Guid SpecialtyId { get; set; }
+        public double AverageRating { get; set; }
+        public int ReviewCount { get; set; }
         public string SpecialtyName { get; set; } = string.Empty;
     }
 }

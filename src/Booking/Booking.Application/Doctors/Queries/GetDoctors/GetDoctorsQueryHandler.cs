@@ -36,6 +36,8 @@ namespace Booking.Application.Doctors.Queries.GetDoctors
                     Id = d.Id,
                     Name = d.Name,
                     Lastname = d.Lastname,
+                    AverageRating = d.AverageRating,
+                    ReviewCount = d.ReviewsCount,
                     SpecialtyId = d.SpecialtyId,
                     SpecialtyName = d.Specialty != null ? d.Specialty.Name : string.Empty
                 })
