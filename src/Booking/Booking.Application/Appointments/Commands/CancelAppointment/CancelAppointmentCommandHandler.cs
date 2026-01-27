@@ -41,7 +41,8 @@ namespace Booking.Application.Appointments.Commands.CancelAppointment
                 roles,
                 cancellationToken);
 
-            _bookingDbContext.Appointments.Remove(appointment);
+            //_bookingDbContext.Appointments.Remove(appointment);
+            appointment.Cancel();
             await _bookingDbContext.SaveChangesAsync(cancellationToken);
         }
 
