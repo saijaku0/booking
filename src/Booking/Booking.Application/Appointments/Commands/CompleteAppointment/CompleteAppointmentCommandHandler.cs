@@ -20,10 +20,8 @@ namespace Booking.Application.Appointments.Commands.CompleteAppointment
             CancellationToken cancellationToken)
         {
             var appointment = await _dbContext.Appointments
-                .FindAsync([request.AppointmentId], cancellationToken);
-
-            if (appointment == null)
-                throw new NotFoundException("Cannot finde appointment by Id", request.AppointmentId);
+                .FindAsync([request.AppointmentId], cancellationToken)
+                ?? throw new NotFoundException("Cannot finde appointment by Id", request.AppointmentId);
 
             var userId = _userService.UserId;
             if (string.IsNullOrEmpty(userId))
