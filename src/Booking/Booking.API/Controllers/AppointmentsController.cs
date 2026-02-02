@@ -6,6 +6,7 @@ using Booking.Application.Appointments.Queries.GetAppointmentById;
 using Booking.Application.Appointments.Queries.GetAppointmentsByDate;
 using Booking.Application.Appointments.Queries.GetDoctorAppointments;
 using Booking.Application.Appointments.Queries.GetDoctorAvailability;
+using Booking.Application.Appointments.Queries.GetPatientAppointments;
 using Booking.Domain.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -147,12 +148,44 @@ namespace Booking.API.Controllers
             return await _mediator.Send(new GetDoctorAvailabilityQuery(doctorId, date));
         }
 
+        /// <summary>
+        /// Marks an appointment as completed.
+        /// </summary>
+        /// <remarks>
+        /// Can only be performed by the assigned doctor or an admin.
+        /// The appointment must be in 'Confirmed' status.
+        /// </remarks>
+        /// <param name="id">Appointment ID</param>
+        /// <response code="204">Success</response>
+        /// <response code="400">Invalid status (e.g. already canceled)</response>
+        /// <response code="403">Not authorized to complete this appointment</response>
         [Authorize(Roles = Roles.Admin + "," + Roles.Doctor)]
         [HttpPost("{id:guid}/complete")]
         public async Task<IActionResult> CompleteAppointment(Guid id)
         {
             await _mediator.Send(new CompleteAppointmentCommand(id));
             return NoContent();
+        }
+
+        /// <summary>
+        /// Retrieves the personal schedule for the currently logged-in patient.
+        /// </summary>
+        /// <remarks>
+        /// Returns a list of all appointments (past and future) where the current user is the patient.
+        /// The list is ordered by StartTime descending (newest first).
+        /// </remarks>
+        /// <returns>A list of appointments</returns>
+        /// <response code="200">Returns the list of appointments (can be empty)</response>
+        /// <response code="401">User is not authorized (token missing or invalid)</response>
+        /// <response code="403">User is authorized but is not a Patient (e.g. a Doctor trying to view patient records)</response>
+        [Authorize(Roles = Roles.Patient)]
+        [HttpGet("my")]
+        [ProducesResponseType(typeof(List<AppointmentDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<List<AppointmentDto>>> GetPatientAppointments()
+        {
+            return await _mediator.Send(new GetPatientAppointmentsQuery());
         }
     }
 }
