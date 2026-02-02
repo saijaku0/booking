@@ -27,7 +27,9 @@ namespace Booking.Application.Appointments.Commands.CompleteAppointment
             if (string.IsNullOrEmpty(userId))
                 throw new UnauthorizedAccessException("User is not authorized");
 
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId)
+                ?? throw new UnauthorizedAccessException("User is not authorized");
+
             var role = await _userManager.GetRolesAsync(user);
 
             if (!role.Contains(Roles.Admin))
