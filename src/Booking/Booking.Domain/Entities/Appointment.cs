@@ -45,4 +45,11 @@ public class Appointment
     {
         Status = AppointmentStatus.Canceled;
     }
+
+    public void Complete()
+    {
+        if (Status != AppointmentStatus.Confirmed)
+            throw new InvalidOperationException("Only confirmed appointments can be completed.");
+        Status = AppointmentStatus.Completed;
+    }
 }
