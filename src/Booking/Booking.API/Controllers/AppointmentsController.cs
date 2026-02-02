@@ -147,6 +147,17 @@ namespace Booking.API.Controllers
             return await _mediator.Send(new GetDoctorAvailabilityQuery(doctorId, date));
         }
 
+        /// <summary>
+        /// Marks an appointment as completed.
+        /// </summary>
+        /// <remarks>
+        /// Can only be performed by the assigned doctor or an admin.
+        /// The appointment must be in 'Confirmed' status.
+        /// </remarks>
+        /// <param name="id">Appointment ID</param>
+        /// <response code="204">Success</response>
+        /// <response code="400">Invalid status (e.g. already canceled)</response>
+        /// <response code="403">Not authorized to complete this appointment</response>
         [Authorize(Roles = Roles.Admin + "," + Roles.Doctor)]
         [HttpPost("{id:guid}/complete")]
         public async Task<IActionResult> CompleteAppointment(Guid id)
