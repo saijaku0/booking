@@ -1,4 +1,5 @@
 ﻿using Booking.Application.Appointments.Commands.CancelAppointment;
+using Booking.Application.Appointments.Commands.CompleteAppointment;
 using Booking.Application.Appointments.Commands.CreateAppointment;
 using Booking.Application.Appointments.Dtos;
 using Booking.Application.Appointments.Queries.GetAppointmentById;
@@ -51,7 +52,7 @@ namespace Booking.API.Controllers
         {
             var appointment = await _mediator.Send(new GetAppointmentByIdQuery { Id = id });
 
-            return Ok(appointment); 
+            return Ok(appointment);
         }
 
         /// <summary>
@@ -68,7 +69,7 @@ namespace Booking.API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<AppointmentDto>>> GetAppointmentsByDateQuery(
             [FromQuery] Guid doctorId,
-            [FromQuery] DateTime start, 
+            [FromQuery] DateTime start,
             [FromQuery] DateTime end)
         {
             var getAppointmentsDate = await _mediator.Send(new GetAppointmentsByDateQuery
@@ -123,12 +124,12 @@ namespace Booking.API.Controllers
         /// <response code="403">Forbidden (Trying to cancel someone else's booking)</response>
         /// <response code="404">Appointment not found</response>
         [HttpDelete("{id:guid}")]
-        [Authorize] 
+        [Authorize]
         public async Task<IActionResult> CancelAppointment(Guid id)
         {
             await _mediator.Send(new CancelAppointmentCommand(id));
 
-            return NoContent(); 
+            return NoContent();
         }
 
         /// <summary>
@@ -144,6 +145,14 @@ namespace Booking.API.Controllers
             [FromQuery] DateTime date)
         {
             return await _mediator.Send(new GetDoctorAvailabilityQuery(doctorId, date));
+        }
+
+        [Authorize(Roles = Roles.Admin + "," + Roles.Doctor)]
+        [HttpPost("{id:guid}/complete")]
+        public async Task<IActionResult> CompleteAppointment(Guid id)
+        {
+            await _mediator.Send(new CompleteAppointmentCommand(id));
+            return NoContent();
         }
     }
 }
