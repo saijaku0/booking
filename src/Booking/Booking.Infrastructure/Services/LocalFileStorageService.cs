@@ -22,9 +22,8 @@ namespace Booking.Infrastructure.Services
             var filePath = Path.Combine(uploadsPath, uniqueFileName);
             using (var fileStreamOutput = new FileStream(filePath, FileMode.Create))
                 await fileStream.CopyToAsync(fileStreamOutput);
-            
-            var relativePath = Path.Combine(UploadsFolder, fileName).Replace("\\", "/");
-            return relativePath;
+
+            return $"/{UploadsFolder}/{uniqueFileName}";
         }
     }
 }
