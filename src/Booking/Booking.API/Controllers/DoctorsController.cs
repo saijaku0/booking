@@ -1,6 +1,8 @@
 ﻿using Booking.Application.Doctors.Command.UpdateDoctor;
+using Booking.Application.Doctors.Command.UpdateProfilePhoto;
 using Booking.Application.Doctors.Dtos;
 using Booking.Application.Doctors.Queries.GetDoctors;
+using Booking.Domain.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +11,7 @@ namespace Booking.API.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class DoctorsController(IMediator mediator) 
+    public class DoctorsController(IMediator mediator)
         : ControllerBase
     {
         private readonly IMediator _mediator = mediator;
@@ -58,6 +60,38 @@ namespace Booking.API.Controllers
                 return BadRequest("Mismatched doctor ID");
 
             await _mediator.Send(updateDoctor);
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Uploads or updates the doctor's profile photo.
+        /// </summary>
+        /// <remarks>
+        /// Accepts an image file (jpg, png). 
+        /// Max file size is usually limited by server settings (default ~30MB).
+        /// </remarks>
+        /// <param name="file">The image file to upload</param>
+        /// <response code="204">Photo updated successfully</response>
+        /// <response code="400">File is empty</response>
+        /// <response code="401">User is not authorized</response>
+        [HttpPost("profile-photo")]
+        [Authorize(Roles = Roles.Doctor)]
+        public async Task<IActionResult> UpdatePhoto(
+            IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("File is empty.");
+
+            using var stream = file.OpenReadStream();
+
+            var command = new UpdateDoctorPhotoCommand(
+                stream,
+                file.FileName,
+                file.ContentType
+            );
+
+            await _mediator.Send(command);
 
             return NoContent();
         }

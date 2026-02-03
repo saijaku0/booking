@@ -22,19 +22,27 @@ namespace Booking.Application.Appointments.Queries.GetPatientAppointments
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var patientId))
                 throw new UnauthorizedAccessException("User is not authorized");
 
-            return await _dbContext.Appointments
-                .AsNoTracking()
-                .Where(a => a.CustomerId == patientId) 
-                .OrderByDescending(a => a.StartTime)
-                .Select(a => new AppointmentDto
+            var query = from appointment in _dbContext.Appointments
+                join doctor in _dbContext.Doctors
+                    on appointment.DoctorId equals doctor.Id
+                join specialty in _dbContext.Specialties
+                    on doctor.SpecialtyId equals specialty.SpecialtyId
+                where appointment.CustomerId == patientId
+                    orderby appointment.StartTime descending
+
+                select new AppointmentDto
                 {
-                    Id = a.Id,
-                    DoctorId = a.DoctorId,
-                    CustomerId = a.CustomerId,
-                    StartTime = a.StartTime,
-                    EndTime = a.EndTime
-                })
-                .ToListAsync(cancellationToken);
+                    Id = appointment.Id,
+                    DoctorId = appointment.DoctorId,
+                    CustomerId = appointment.CustomerId,
+                    StartTime = appointment.StartTime,
+                    EndTime = appointment.EndTime,
+                    Status = appointment.Status.ToString(),
+                    DoctorName = $"{doctor.Name} {doctor.Lastname}",
+                    Specialty = specialty.Name
+                };
+
+            return await query.ToListAsync(cancellationToken);
         }
     }
 }
