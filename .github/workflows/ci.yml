@@ -2,9 +2,7 @@ name: .NET CI
 
 on:
   push:
-    branches: [ "feature/*", "refactor/*", "test/*", "chore/*", "docs/*"]
   pull_request:
-    branches: [ "develop" ]
 
 permissions:
   contents: read
