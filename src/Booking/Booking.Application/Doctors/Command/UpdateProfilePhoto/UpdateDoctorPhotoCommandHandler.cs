@@ -26,6 +26,12 @@ namespace Booking.Application.Doctors.Command.UpdateProfilePhoto
                 .FirstOrDefaultAsync(d => d.UserId == doctorId, cancellationToken)
                 ?? throw new KeyNotFoundException("Doctor not found.");
 
+            var allowExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+            var fileExtension = Path.GetExtension(request.FileName)?.ToLowerInvariant();
+
+            if (string.IsNullOrEmpty(fileExtension) || !allowExtensions.Contains(fileExtension))
+                throw new ArgumentException("Only images are allowed.");
+
             var photoUrl = await _fileStorageService
                 .UploadFileAsync(
                     request.PhotoStream,

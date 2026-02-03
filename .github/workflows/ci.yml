@@ -2,9 +2,7 @@ name: .NET CI
 
 on:
   push:
-    branches: [ "feature/*", "refactor/*", "test/*", "chore/*", "docs/*"]
   pull_request:
-    branches: [ "develop" ]
 
 permissions:
   contents: read
@@ -12,13 +10,14 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: development
     services:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_USER: booking_admin
-          POSTGRES_PASSWORD: SecretSuperPassword
-          POSTGRES_DB: booking_db
+          POSTGRES_USER: ${{secrets.DB_USER}}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{secrets.POSTGRES_DB}}
         ports:
           - 5432:5432
         options: >-
@@ -45,4 +44,4 @@ jobs:
       - name: Run Integration Tests
         run: dotnet test --no-build --configuration Release --logger trx --results-directory "TestResults"
         env: 
-          ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=booking_db;Username=booking_admin;Password=SecretSuperPassword"
+          ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=${{secrets.POSTGRES_DB}};Username=${{secrets.DB_USER}};Password=${{ secrets.POSTGRES_PASSWORD }}"
