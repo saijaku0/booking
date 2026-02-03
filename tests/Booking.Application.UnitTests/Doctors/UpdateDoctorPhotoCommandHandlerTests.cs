@@ -73,5 +73,33 @@ namespace tests.Booking.Application.UnitTests.Doctors
                 "image/jpeg"),
                 Times.Once);
         }
+
+        [Fact]
+        public async Task Handle_ShouldThrowException_WhenFileIsNotImage()
+        {
+            var userId = Guid.NewGuid().ToString();
+            var doctor = new Doctor("Gregory", "House", Guid.NewGuid(), true) { UserId = userId };
+
+            await _context.Doctors.AddAsync(doctor);
+            await _context.SaveChangesAsync();
+            _currentUserServiceMock.Setup(x => x.UserId).Returns(userId);
+
+            var command = new UpdateDoctorPhotoCommand(
+                new MemoryStream(),
+                "virus.exe",       
+                "application/x-msdownload" 
+            );
+
+            var action = async () => await _handler.Handle(command, CancellationToken.None);
+
+            await action.Should().ThrowAsync<ArgumentException>()
+                .WithMessage("*Only images are allowed*");
+
+            _fileStorageMock.Verify(x => x.UploadFileAsync(
+                It.IsAny<Stream>(),
+                It.IsAny<string>(),
+                It.IsAny<string>()),
+                Times.Never); 
+        }
     }
 }
