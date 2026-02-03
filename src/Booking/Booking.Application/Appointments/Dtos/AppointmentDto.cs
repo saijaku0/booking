@@ -17,6 +17,9 @@
         /// ID of the client who made the reservation
         /// </summary>
         public Guid CustomerId { get; init; }
+        public string DoctorName { get; init; } = string.Empty;
+        public string Specialty { get; init; } = string.Empty;
+        public string Status { get; init; } = string.Empty;
         /// <summary>
         /// Start date and time (UTC)
         /// </summary>
