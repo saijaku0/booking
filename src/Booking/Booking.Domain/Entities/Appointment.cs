@@ -17,6 +17,7 @@ public class Appointment
     public DateTime EndTime { get; private set; }
     public AppointmentStatus Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
+    public string? MedicalNotes { get; private set; }
 
     private Appointment() { }
 
@@ -46,10 +47,14 @@ public class Appointment
         Status = AppointmentStatus.Canceled;
     }
 
-    public void Complete()
+    public void Complete(string notes)
     {
         if (Status != AppointmentStatus.Confirmed)
             throw new InvalidOperationException("Only confirmed appointments can be completed.");
+        if (string.IsNullOrWhiteSpace(notes))
+            throw new InvalidOperationException("Medical notes must be provided to complete the appointment.");
+
+        MedicalNotes = notes;
         Status = AppointmentStatus.Completed;
     }
 }
