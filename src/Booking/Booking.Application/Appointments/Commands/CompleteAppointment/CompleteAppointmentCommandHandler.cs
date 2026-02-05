@@ -4,6 +4,7 @@ using Booking.Domain.Constants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
+// Remove "test" notes and replace with actual notes from request
 namespace Booking.Application.Appointments.Commands.CompleteAppointment
 {
     public class CompleteAppointmentCommandHandler(
@@ -43,7 +44,7 @@ namespace Booking.Application.Appointments.Commands.CompleteAppointment
 
             try
             {
-                appointment.Complete();
+                appointment.Complete("test");
                 await _dbContext.SaveChangesAsync(cancellationToken);
             }
             catch (Exception ex)
