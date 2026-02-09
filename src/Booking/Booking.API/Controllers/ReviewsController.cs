@@ -1,4 +1,6 @@
 ﻿using Booking.Application.Reviews.Commands.CreateReview;
+using Booking.Application.Reviews.Dtos;
+using Booking.Application.Reviews.Query;
 using Booking.Domain.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -38,12 +40,12 @@ namespace Booking.API.Controllers
             return Ok();
         }
 
-        // TO DO: add get reviews for doctor, but first you need to create ReviewDto and GetDoctorReviewsQuery
-        /*/// <summary>
+        /// <summary>
         /// Get all reviews for a specific doctor.
         /// </summary>
         /// <param name="doctorId">The unique identifier of the doctor</param>
         /// <returns>List of reviews with ratings and comments</returns>
+        /// <response code="200">Get reviews for doctor</response>
         [HttpGet] 
         [AllowAnonymous]
         [ProducesResponseType(typeof(List<ReviewDto>), StatusCodes.Status200OK)]
@@ -54,6 +56,6 @@ namespace Booking.API.Controllers
             var reviews = await _mediatR.Send(new GetDoctorReviewsQuery(doctorId));
 
             return Ok(reviews);
-        }*/
+        }
     }
 }

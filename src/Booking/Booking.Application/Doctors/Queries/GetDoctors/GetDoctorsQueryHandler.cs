@@ -15,32 +15,42 @@ namespace Booking.Application.Doctors.Queries.GetDoctors
             CancellationToken cancellationToken)
         {
             var query = _context.Doctors
-                .AsNoTracking()
-                .AsQueryable();
+            .AsNoTracking() 
+            .AsQueryable();
 
             if (getDoctorsQuery.SpecialtyId.HasValue)
+            {
                 query = query.Where(d => d.SpecialtyId == getDoctorsQuery.SpecialtyId.Value);
+            }
 
             if (!string.IsNullOrWhiteSpace(getDoctorsQuery.SearchTerm))
             {
-                var term = getDoctorsQuery.SearchTerm.ToLower();
+                var term = getDoctorsQuery.SearchTerm.ToLower().Trim();
 
                 query = query.Where(d =>
                     d.Name.ToLower().Contains(term) ||
                     d.Lastname.ToLower().Contains(term));
             }
 
+            query = query
+                .Where(d => d.IsActive) 
+                .OrderByDescending(d => d.AverageRating)
+                .ThenByDescending(d => d.ReviewsCount);
+
             return await query
                 .Select(d => new DoctorDto
-                {
-                    Id = d.Id,
-                    Name = d.Name,
-                    Lastname = d.Lastname,
-                    AverageRating = d.AverageRating,
-                    ReviewCount = d.ReviewsCount,
-                    SpecialtyId = d.SpecialtyId,
-                    SpecialtyName = d.Specialty != null ? d.Specialty.Name : string.Empty
-                })
+                (
+                    d.Id,
+                    d.Name,
+                    d.Lastname,
+                    d.SpecialtyId,
+                    d.ImageUrl,
+                    d.AverageRating,
+                    d.ReviewsCount,
+                    d.Specialty != null ? d.Specialty.Name : "General",
+                    d.ConsultationFee,
+                    d.ExperienceYears
+                ))
                 .ToListAsync(cancellationToken);
         }
     }

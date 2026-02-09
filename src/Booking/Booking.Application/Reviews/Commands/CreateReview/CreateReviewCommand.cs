@@ -4,6 +4,7 @@ namespace Booking.Application.Reviews.Commands.CreateReview
 {
     public record CreateReviewCommand(
         Guid DoctorId, 
-        int Rating)
+        int Rating,
+        string Text)
         : IRequest<Guid>; 
 }

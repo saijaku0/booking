@@ -18,6 +18,8 @@ public class Doctor
     public bool IsActive { get; private set; }
     [Column(TypeName = "decimal(18,2)")]
     public decimal ConsultationFee { get; private set; }
+    private readonly List<Review> _reviews = new();
+    public IReadOnlyCollection<Review> Reviews => _reviews.AsReadOnly();
 
     private Doctor() { }
 
@@ -59,12 +61,14 @@ public class Doctor
         ConsultationFee = consultationFee;
     }
 
-    public void AddReview(double rating)
+    public void AddReview(Review review)
     {
-        if (rating < 0 || rating > 5) 
-            throw new ArgumentException("Rating must be between 0 and 5");
+        if (review == null) throw new ArgumentNullException(nameof(review));
+
+        _reviews.Add(review);
+
         double totalScore = AverageRating * ReviewsCount;
-        totalScore += rating;
+        totalScore += review.Rating;
 
         ReviewsCount++;
 
