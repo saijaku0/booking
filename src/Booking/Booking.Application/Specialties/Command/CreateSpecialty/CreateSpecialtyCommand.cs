@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Booking.Application.Admin.Commands.CreateSpecialty
+namespace Booking.Application.Specialties.Command.CreateSpecialty
 {
     public record CreateSpecialtyCommand (string Name)
         : IRequest<Guid>;

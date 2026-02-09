@@ -1,4 +1,4 @@
-﻿using Booking.Application.Admin.Commands.CreateSpecialty;
+﻿using Booking.Application.Specialties.Command.CreateSpecialty;
 using Booking.Application.Specialties.Dtos;
 using Booking.Application.Specialties.Queries;
 using Booking.Domain.Constants;
