@@ -2,6 +2,7 @@
 using Booking.Application.Doctors.Command.UpdateDoctor;
 using Booking.Application.Doctors.Command.UpdateProfilePhoto;
 using Booking.Application.Doctors.Dtos;
+using Booking.Application.Doctors.Queries.GetDoctorById;
 using Booking.Application.Doctors.Queries.GetDoctors;
 using Booking.Domain.Constants;
 using MediatR;
@@ -127,14 +128,19 @@ namespace Booking.API.Controllers
             return NoContent();
         }
 
-        // TO DO: create GetDoctorByIdQuery query method 
-        //[Authorize(Roles = Roles.Admin)]
-        //[HttpGet("{id:guid}")]
-        //public async Task<IActionResult> GetDoctorById(Guid id)
-        //{
-        //    var appointment = await _mediator.Send(new GetDoctorByIdQuery { Id = id });
-
-        //    return Ok(appointment);
-        //}
+        /// <summary>
+        /// Retrieves full details of a specific doctor (including rating).
+        /// </summary>
+        /// <param name="id">Doctor Id</param>
+        /// <returns>Doctor information</returns>
+        [HttpGet("{id:guid}")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(DoctorDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<DoctorDto>> GetDoctorById(Guid id)
+        {
+            var doctor = await _mediator.Send(new GetDoctorByIdQuery(id));
+            return Ok(doctor);
+        }
     }
 }
