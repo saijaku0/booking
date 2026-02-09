@@ -2,7 +2,7 @@
 using Booking.Domain.Entities;
 using MediatR;
 
-namespace Booking.Application.Admin.Commands.CreateSpecialty
+namespace Booking.Application.Specialties.Command.CreateSpecialty
 {
     public class CreateSpecialtyCommandHandler(IBookingDbContext dbContext)
         : IRequestHandler<CreateSpecialtyCommand, Guid>
