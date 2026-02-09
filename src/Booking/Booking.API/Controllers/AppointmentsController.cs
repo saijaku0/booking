@@ -3,6 +3,7 @@ using Booking.Application.Appointments.Commands.CompleteAppointment;
 using Booking.Application.Appointments.Commands.CreateAppointment;
 using Booking.Application.Appointments.Dtos;
 using Booking.Application.Appointments.Queries.GetAppointmentById;
+using Booking.Application.Appointments.Queries.GetAppointmentReport;
 using Booking.Application.Appointments.Queries.GetAppointmentsByDate;
 using Booking.Application.Appointments.Queries.GetDoctorAppointments;
 using Booking.Application.Appointments.Queries.GetDoctorAvailability;
@@ -189,6 +190,19 @@ namespace Booking.API.Controllers
         public async Task<ActionResult<List<AppointmentDto>>> GetPatientAppointments()
         {
             return await _mediator.Send(new GetPatientAppointmentsQuery());
+        }
+
+        /// <summary>
+        /// Downloads a PDF medical report for a specific appointment.
+        /// </summary>
+        [HttpGet("{id:guid}/report")]
+        [Authorize] 
+        public async Task<IActionResult> GetReport(Guid id)
+        {
+            var query = new GetAppointmentReportQuery(id);
+            var result = await _mediator.Send(query);
+
+            return File(result.Content, result.ContentType, result.FileName);
         }
     }
 }

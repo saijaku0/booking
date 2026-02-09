@@ -18,6 +18,8 @@ namespace Booking.Infrastructure.Services
         public async Task<string?> GetUserNameAsync(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
+            if (user is ApplicationUser appUser)
+                return $"{appUser.FirstName} {appUser.LastName}";
             return user?.UserName;
         }
 
