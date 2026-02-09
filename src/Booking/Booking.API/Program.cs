@@ -6,7 +6,10 @@ using Booking.Infrastructure;
 using Booking.Infrastructure.Persistence;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using QuestPDF.Infrastructure;
 using Scalar.AspNetCore;
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 

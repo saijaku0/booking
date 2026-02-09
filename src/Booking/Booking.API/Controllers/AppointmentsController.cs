@@ -3,6 +3,7 @@ using Booking.Application.Appointments.Commands.CompleteAppointment;
 using Booking.Application.Appointments.Commands.CreateAppointment;
 using Booking.Application.Appointments.Dtos;
 using Booking.Application.Appointments.Queries.GetAppointmentById;
+using Booking.Application.Appointments.Queries.GetAppointmentReport;
 using Booking.Application.Appointments.Queries.GetAppointmentsByDate;
 using Booking.Application.Appointments.Queries.GetDoctorAppointments;
 using Booking.Application.Appointments.Queries.GetDoctorAvailability;
@@ -30,6 +31,9 @@ namespace Booking.API.Controllers
         /// <response code="200">Successfully created. The Location header will contain a link to the resource</response>
         /// <response code="400">Validation error (incorrect dates) or overlap with another booking.</response>
         [HttpPost]
+        [Authorize(Roles = Roles.Patient)] 
+        [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateAppointmentCommand command)
         {
             var id = await _mediator.Send(command);
@@ -49,6 +53,8 @@ namespace Booking.API.Controllers
         /// <response code="200">Successful request. Returns a reservation</response>
         /// <response code="404">Invalid ID. Return a errore code</response>
         [HttpGet("{id:guid}")]
+        [ProducesResponseType(typeof(AppointmentDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(Guid id)
         {
             var appointment = await _mediator.Send(new GetAppointmentByIdQuery { Id = id });
@@ -68,6 +74,8 @@ namespace Booking.API.Controllers
         /// <returns>List of booking</returns>
         /// <response code="200">Successful request. Returns a list (may be empty)</response>
         [HttpGet]
+        [Authorize(Roles = Roles.Admin)]
+        [ProducesResponseType(typeof(List<AppointmentDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<AppointmentDto>>> GetAppointmentsByDateQuery(
             [FromQuery] Guid doctorId,
             [FromQuery] DateTime start,
@@ -97,8 +105,9 @@ namespace Booking.API.Controllers
         /// <response code="200">Returns the list of appointments (can be empty).</response>
         /// <response code="401">User is not authorized.</response>
         /// <response code="403">User is authorized but does not have the 'doctor' role.</response>
+        [HttpGet("doctor-schedule")]
         [Authorize(Roles = Roles.Doctor)]
-        [HttpGet("me")]
+        [ProducesResponseType(typeof(List<AppointmentDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<AppointmentDto>>> GetDoctorAppointmentsQuery(
             [FromQuery] DateTime? start,
             [FromQuery] DateTime? end)
@@ -124,8 +133,11 @@ namespace Booking.API.Controllers
         /// <response code="204">Success (No Content)</response>
         /// <response code="403">Forbidden (Trying to cancel someone else's booking)</response>
         /// <response code="404">Appointment not found</response>
-        [HttpDelete("{id:guid}")]
         [Authorize]
+        [HttpDelete("{id:guid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> CancelAppointment(Guid id)
         {
             await _mediator.Send(new CancelAppointmentCommand(id));
@@ -139,8 +151,9 @@ namespace Booking.API.Controllers
         /// <param name="doctorId"></param>
         /// <param name="date"></param>
         /// <returns></returns>
-        [HttpGet("availability")]
         [AllowAnonymous]
+        [HttpGet("availability")]
+        [ProducesResponseType(typeof(List<TimeSlotDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<TimeSlotDto>>> GetAvailability(
             [FromQuery] Guid doctorId,
             [FromQuery] DateTime date)
@@ -160,8 +173,10 @@ namespace Booking.API.Controllers
         /// <response code="204">Success</response>
         /// <response code="400">Invalid status (e.g. already canceled)</response>
         /// <response code="403">Not authorized to complete this appointment</response>
-        [Authorize(Roles = Roles.Admin + "," + Roles.Doctor)]
         [HttpPost("{id:guid}/complete")]
+        [Authorize(Roles = Roles.Admin + "," + Roles.Doctor)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CompleteAppointment(
             Guid id,
             [FromBody] string notes)
@@ -181,14 +196,36 @@ namespace Booking.API.Controllers
         /// <response code="200">Returns the list of appointments (can be empty)</response>
         /// <response code="401">User is not authorized (token missing or invalid)</response>
         /// <response code="403">User is authorized but is not a Patient (e.g. a Doctor trying to view patient records)</response>
+        [HttpGet("patient-history")]
         [Authorize(Roles = Roles.Patient)]
-        [HttpGet("my")]
         [ProducesResponseType(typeof(List<AppointmentDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<List<AppointmentDto>>> GetPatientAppointments()
         {
             return await _mediator.Send(new GetPatientAppointmentsQuery());
+        }
+
+        /// <summary>
+        /// Downloads a PDF medical report for a specific appointment.
+        /// </summary>
+        /// <remarks>
+        /// Returns a PDF file containing the medical report for the specified appointment. 
+        /// The report includes details such as appointment date, doctor information, patient information, 
+        /// and any notes or findings recorded by the doctor. This endpoint is typically used by patients to access their medical reports after an appointment 
+        /// has been completed. Access to the report is restricted to the patient associated with the appointment and authorized medical staff.
+        /// </remarks>
+        /// <returns>A PDF file containing the medical report</returns>
+        /// <response code="200">Returns the PDF medical report</response>
+        [Authorize]
+        [HttpGet("{id:guid}/report")]
+        [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetReport(Guid id)
+        {
+            var query = new GetAppointmentReportQuery(id);
+            var result = await _mediator.Send(query);
+
+            return File(result.Content, result.ContentType, result.FileName);
         }
     }
 }

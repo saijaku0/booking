@@ -3,7 +3,7 @@
 namespace Booking.Application.Doctors.Command.UpdateDoctor
 {
     public record UpdateDoctorCommand(
-        string UserId,
+        Guid UserId,
         string Name,
         string Lastname,
         string Specialty,
