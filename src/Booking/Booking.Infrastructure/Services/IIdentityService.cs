@@ -1,4 +1,5 @@
 ﻿using Booking.Application.Common.Interfaces;
+using Booking.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 
@@ -6,12 +7,12 @@ namespace Booking.Infrastructure.Services
 {
 
     public class IdentityService(
-        UserManager<IdentityUser> userManager,
-        IUserClaimsPrincipalFactory<IdentityUser> userClaimsPrincipalFactory,
+        UserManager<ApplicationUser> userManager,
+        IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory,
         IAuthorizationService authorizationService) : IIdentityService
     {
-        private readonly UserManager<IdentityUser> _userManager = userManager;
-        private readonly IUserClaimsPrincipalFactory<IdentityUser> _userClaimsPrincipalFactory = userClaimsPrincipalFactory;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly IUserClaimsPrincipalFactory<ApplicationUser> _userClaimsPrincipalFactory = userClaimsPrincipalFactory;
         private readonly IAuthorizationService _authorizationService = authorizationService;
 
         public async Task<string?> GetUserNameAsync(string userId)
