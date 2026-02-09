@@ -9,6 +9,7 @@ namespace Booking.Application.Common.Interfaces
         DbSet<Doctor> Doctors { get; }
         DbSet<Specialty> Specialties { get; }
         DbSet<Review> Reviews { get; }
+        DbSet<AppointmentAttachment> AppointmentAttachments { get; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }
 }
