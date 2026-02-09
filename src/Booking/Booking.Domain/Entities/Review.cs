@@ -3,9 +3,12 @@
     public class Review
     {
         public Guid ReviewId { get; private set; }
+        public Guid PatientId { get; private set; }
         public Guid DoctorId { get; private set; }
         public Doctor Doctor { get; private set; } = null!;
         public int Rating { get; private set; }
+        public string Text { get; private set; } = string.Empty;
+        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
         private Review() { }
 

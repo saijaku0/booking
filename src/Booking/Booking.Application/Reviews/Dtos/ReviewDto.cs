@@ -4,6 +4,6 @@
         Guid Id,
         string PatientName,
         int Rating,
-        string text,
+        string Text,
         DateTime CreatedAt);
 }
