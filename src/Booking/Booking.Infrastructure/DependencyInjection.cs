@@ -1,4 +1,5 @@
-﻿using Booking.Application.Common.Interfaces;
+﻿using Booking.Application.Appointments.Common.Interfaces;
+using Booking.Application.Common.Interfaces;
 using Booking.Domain.Entities;
 using Booking.Infrastructure.Identity;
 using Booking.Infrastructure.Persistence;
@@ -29,6 +30,7 @@ namespace Booking.Infrastructure
             services.AddTransient<IFileStorageService, LocalFileStorageService>();
 
             services.AddTransient<IIdentityService, IdentityService>();
+            services.AddTransient<IPdfGenerator, PdfGenerator>();
 
             services.AddIdentityCore<ApplicationUser>()
                 .AddRoles<IdentityRole>()
