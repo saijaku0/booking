@@ -1,21 +1,20 @@
 ﻿using Booking.Application.Common.Exceptions;
 using Booking.Application.Common.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Booking.Domain.Constants;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Booking.Application.Appointments.Commands.CompleteAppointment
 {
     public class CompleteAppointmentCommandHandler(
         IBookingDbContext dbContext,
         ICurrentUserService userService,
-        UserManager<IdentityUser> userManager)
+        IIdentityService identityService)
         : IRequestHandler<CompleteAppointmentCommand>
     {
         private readonly IBookingDbContext _dbContext = dbContext;
         private readonly ICurrentUserService _userService = userService;
-        private readonly UserManager<IdentityUser> _userManager = userManager;
+        private readonly IIdentityService _identityService = identityService;
 
         public async Task Handle(
             CompleteAppointmentCommand request,
@@ -29,11 +28,7 @@ namespace Booking.Application.Appointments.Commands.CompleteAppointment
             if (string.IsNullOrEmpty(userId))
                 throw new UnauthorizedAccessException("User is not authorized");
 
-            var user = await _userManager.FindByIdAsync(userId)
-                ?? throw new UnauthorizedAccessException("User is not authorized");
-
-            var role = await _userManager.GetRolesAsync(user);
-            var isAdmin = role.Contains(Roles.Admin);
+            var isAdmin = await _identityService.IsInRoleAsync(userId, Roles.Admin);
 
             if (!isAdmin)
             {

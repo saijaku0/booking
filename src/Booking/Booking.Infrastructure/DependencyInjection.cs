@@ -1,8 +1,10 @@
 ﻿using Booking.Application.Common.Interfaces;
+using Booking.Domain.Entities;
 using Booking.Infrastructure.Identity;
 using Booking.Infrastructure.Persistence;
 using Booking.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +27,12 @@ namespace Booking.Infrastructure
 
             services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<IFileStorageService, LocalFileStorageService>();
+
+            services.AddTransient<IIdentityService, IdentityService>();
+
+            services.AddIdentityCore<ApplicationUser>()
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<BookingDbContext>();
 
             services.AddHttpContextAccessor();
 

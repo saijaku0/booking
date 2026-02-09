@@ -18,6 +18,8 @@ public class Appointment
     public AppointmentStatus Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public string? MedicalNotes { get; private set; }
+    public IReadOnlyCollection<AppointmentAttachment> Attachments => _attachments.AsReadOnly();
+    private readonly List<AppointmentAttachment> _attachments = new();
 
     private Appointment() { }
 
@@ -33,6 +35,14 @@ public class Appointment
         EndTime = end;
         Status = AppointmentStatus.Pending;
         CreatedAt = DateTime.UtcNow;
+    }
+
+    public void AddAttachment(string fileName, string filePath, string fileType)
+    {
+        if (Status == AppointmentStatus.Canceled)
+            throw new InvalidOperationException("Cannot add attachments to a canceled appointment.");
+        var attachment = new AppointmentAttachment(Id, fileName, filePath, fileType);
+        _attachments.Add(attachment);
     }
 
     public void Confirm()
