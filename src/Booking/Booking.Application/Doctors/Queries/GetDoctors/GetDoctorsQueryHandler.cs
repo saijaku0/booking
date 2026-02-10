@@ -41,6 +41,7 @@ namespace Booking.Application.Doctors.Queries.GetDoctors
                 .Select(d => new DoctorDto
                 (
                     d.Id,
+                    d.UserId,
                     d.Name,
                     d.Lastname,
                     d.SpecialtyId,

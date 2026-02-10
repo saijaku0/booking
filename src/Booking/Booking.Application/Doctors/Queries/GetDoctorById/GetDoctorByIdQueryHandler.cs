@@ -21,6 +21,7 @@ namespace Booking.Application.Doctors.Queries.GetDoctorById
                 .Where(d => d.Id == request.Id)
                 .Select(s => new DoctorDto(
                     s.Id,
+                    s.UserId,
                     s.Name,
                     s.Lastname,
                     s.SpecialtyId,
