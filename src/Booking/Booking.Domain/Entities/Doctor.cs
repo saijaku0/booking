@@ -50,6 +50,11 @@ public class Doctor
         ReviewsCount = 0;
     }
 
+    public Doctor(string v1, string v2, Guid specialtyId, bool v3)
+    {
+        SpecialtyId = specialtyId;
+    }
+
     public void UpdateProfile(
         string name,
         string lastname,
