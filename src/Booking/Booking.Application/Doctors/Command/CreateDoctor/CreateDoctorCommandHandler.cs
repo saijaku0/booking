@@ -1,5 +1,6 @@
 ﻿using Booking.Application.Common.Exceptions;
 using Booking.Application.Common.Interfaces;
+using Booking.Application.Doctors.Command.CreateDoctor;
 using Booking.Domain.Constants;
 using Booking.Domain.Entities;
 using MediatR;
@@ -40,7 +41,11 @@ namespace Booking.Application.Admin.Commands.CreateDoctor
                 createDoctor.Lastname,
                 createDoctor.SpecialtyId,
                 createDoctor.IsActive,
-                user.Id
+                createDoctor.ConsultationFee,
+                createDoctor.ExperienceYears,
+                user.Id,
+                createDoctor.Bio,
+                createDoctor.ImageUrl
             );
 
             _dbContext.Doctors.Add(doctor);

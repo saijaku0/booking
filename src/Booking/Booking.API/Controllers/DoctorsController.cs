@@ -1,4 +1,4 @@
-﻿using Booking.Application.Admin.Commands.CreateDoctor;
+﻿using Booking.Application.Doctors.Command.CreateDoctor;
 using Booking.Application.Doctors.Command.UpdateDoctor;
 using Booking.Application.Doctors.Command.UpdateProfilePhoto;
 using Booking.Application.Doctors.Dtos;
