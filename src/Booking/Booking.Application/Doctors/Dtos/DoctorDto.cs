@@ -2,6 +2,7 @@
 {
     public record DoctorDto(
         Guid Id,
+        string? UserId,
         string Name,
         string Lastname,
         Guid SpecialtyId,
