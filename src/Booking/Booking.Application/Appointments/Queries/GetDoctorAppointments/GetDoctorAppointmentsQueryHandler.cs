@@ -1,62 +1,81 @@
 ﻿using Booking.Application.Appointments.Dtos;
 using Booking.Application.Common.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
-namespace Booking.Application.Appointments.Queries.GetDoctorAppointments
+namespace Booking.Application.Appointments.Queries.GetDoctorAppointments;
+
+public class GetDoctorAppointmentsQueryHandler(
+    IBookingDbContext bookingDbContext,
+    ICurrentUserService currentUserService,
+    IIdentityService identityService) 
+    : IRequestHandler<GetDoctorAppointmentsQuery, List<AppointmentDto>>
 {
-    public class GetDoctorAppointmentsQueryHandler(
-        IBookingDbContext bookingDbContext,
-        ICurrentUserService currentUserService) 
-        : IRequestHandler<GetDoctorAppointmentsQuery, List<AppointmentDto>>
+    private readonly IBookingDbContext _context = bookingDbContext;
+    private readonly ICurrentUserService _currentUserService = currentUserService;
+    private readonly IIdentityService _identityService = identityService;
+
+    public async Task<List<AppointmentDto>> Handle(
+        GetDoctorAppointmentsQuery request,
+        CancellationToken cancellationToken)
     {
-        private readonly IBookingDbContext _context = bookingDbContext;
-        private readonly ICurrentUserService _currentUserService = currentUserService;
+        var doctorId = await GetCurrentDoctorIdAsync(cancellationToken);
 
-        public async Task<List<AppointmentDto>> Handle(
-            GetDoctorAppointmentsQuery request, 
-            CancellationToken cancellationToken)
+        var query = _context.Appointments
+            .AsNoTracking()
+            .Where(a => a.DoctorId == doctorId);
+
+        if (request.Start.HasValue)
+            query = query.Where(a => a.StartTime >= request.Start.Value);
+
+        if (request.End.HasValue)
+            query = query.Where(a => a.EndTime <= request.End.Value);
+
+        var appointments = await query
+            .OrderBy(a => a.StartTime)
+            .ToListAsync(cancellationToken);
+
+        var resultDtos = new List<AppointmentDto>();
+
+        foreach (var app in appointments)
         {
-            var doctorId = await GetCurrentDoctorIdAsync(cancellationToken);
+            var patientName = await _identityService.GetUserNameAsync(app.CustomerId.ToString())
+                              ?? "Unknown Patient";
 
-            var query = _context.Appointments
-                .AsNoTracking()
-                .Where(a => a.DoctorId == doctorId);
+            resultDtos.Add(new AppointmentDto
+            {
+                Id = app.Id,
 
-            if (request.Start.HasValue)
-                query = query.Where(a => a.StartTime >= request.Start.Value);
+                DoctorId = app.DoctorId,
 
-            if (request.End.HasValue)
-                query = query.Where(a => a.EndTime <= request.End.Value);
+                CustomerId = app.CustomerId,
+                PatientName = patientName, 
 
-            return await query
-                .OrderBy(a => a.StartTime)
-                .Select(a => new AppointmentDto
-                {
-                    Id = a.Id,
-                    DoctorId = a.DoctorId,
-                    CustomerId = a.CustomerId,
-                    StartTime = a.StartTime,
-                    EndTime = a.EndTime
-                })
-                .ToListAsync(cancellationToken);
+                StartTime = app.StartTime,
+                EndTime = app.EndTime,
+                Status = app.Status.ToString(),
+                MedicalNotes = app.MedicalNotes
+            });
         }
 
-        private async Task<Guid> GetCurrentDoctorIdAsync(CancellationToken token)
-        {
-            var currentUserId = _currentUserService.UserId;
-            if (string.IsNullOrEmpty(currentUserId))
-                throw new UnauthorizedAccessException("User is not logged in.");
+        return resultDtos;
+    }
 
-            var doctorId = await _context.Doctors
-                .Where(d => d.UserId == currentUserId)
-                .Select(d => d.Id)
-                .FirstOrDefaultAsync(token);
+    private async Task<Guid> GetCurrentDoctorIdAsync(CancellationToken token)
+    {
+        var currentUserId = _currentUserService.UserId;
 
-            if (doctorId == Guid.Empty) 
-                throw new UnauthorizedAccessException("User is not a registered doctor.");
+        if (string.IsNullOrEmpty(currentUserId))
+            throw new UnauthorizedAccessException("User is not logged in.");
 
-            return doctorId;
-        }
+        var doctorId = await _context.Doctors
+            .Where(d => d.UserId == currentUserId)
+            .Select(d => d.Id)
+            .FirstOrDefaultAsync(token);
+
+        if (doctorId == Guid.Empty)
+            throw new UnauthorizedAccessException("User is not a registered doctor profile.");
+
+        return doctorId;
     }
 }
