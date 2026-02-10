@@ -50,7 +50,8 @@ namespace Booking.Application.Doctors.Queries.GetDoctors
                     d.ReviewsCount,
                     d.Specialty != null ? d.Specialty.Name : "General",
                     d.ConsultationFee,
-                    d.ExperienceYears
+                    d.ExperienceYears,
+                    d.Bio
                 ))
                 .ToListAsync(cancellationToken);
         }
