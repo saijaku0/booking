@@ -30,7 +30,8 @@ namespace Booking.Application.Doctors.Queries.GetDoctorById
                     s.Reviews.Count(),
                     s.Specialty != null ? s.Specialty.Name : "No Specialty",
                     s.ConsultationFee,
-                    s.ExperienceYears
+                    s.ExperienceYears,
+                    s.Bio
                     ))
                 .FirstOrDefaultAsync(cancellationToken)
                 ?? throw new NotFoundException("Doctor", request.Id);

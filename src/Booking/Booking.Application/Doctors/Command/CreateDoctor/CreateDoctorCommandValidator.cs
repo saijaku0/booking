@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Booking.Application.Doctors.Command.CreateDoctor;
+using FluentValidation;
 
 namespace Booking.Application.Admin.Commands.CreateDoctor
 {

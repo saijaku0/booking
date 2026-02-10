@@ -11,5 +11,6 @@
         int ReviewCount,
         string SpecialtyName,
         decimal ConsultationFee,
-        int ExperienceYears);
+        int ExperienceYears,
+        string? Bio);
 }

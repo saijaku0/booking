@@ -28,7 +28,11 @@ public class Doctor
         string lastname, 
         Guid specialtyId,
         bool isActive,
-        string? userId = null)
+        decimal consultationFee, 
+        int experienceYears,
+        string userId,
+        string? bio,             
+        string? imageUrl)
     {
         Id = Guid.NewGuid();
         Name = name;
@@ -36,6 +40,19 @@ public class Doctor
         SpecialtyId = specialtyId;
         UserId = userId;
         IsActive = isActive;
+
+        ConsultationFee = consultationFee;
+        ExperienceYears = experienceYears;
+        Bio = bio;
+        ImageUrl = imageUrl;
+
+        AverageRating = 0;
+        ReviewsCount = 0;
+    }
+
+    public Doctor(string v1, string v2, Guid specialtyId, bool v3)
+    {
+        SpecialtyId = specialtyId;
     }
 
     public void UpdateProfile(

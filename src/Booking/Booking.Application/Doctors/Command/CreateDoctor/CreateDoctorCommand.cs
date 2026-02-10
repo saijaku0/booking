@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Booking.Application.Admin.Commands.CreateDoctor
+namespace Booking.Application.Doctors.Command.CreateDoctor
 {
     public record CreateDoctorCommand
         : IRequest<Guid>
@@ -11,5 +11,9 @@ namespace Booking.Application.Admin.Commands.CreateDoctor
         public string Lastname {  get; set; } = string.Empty;
         public Guid SpecialtyId {  get; set; }
         public bool IsActive { get; set; }
+        public decimal ConsultationFee { get; set; }
+        public int ExperienceYears { get; set; }
+        public string? Bio { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }
