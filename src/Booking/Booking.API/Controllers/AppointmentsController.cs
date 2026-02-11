@@ -1,5 +1,6 @@
 ﻿using Booking.Application.Appointments.Commands.CancelAppointment;
 using Booking.Application.Appointments.Commands.CompleteAppointment;
+using Booking.Application.Appointments.Commands.ConfirmAppointment;
 using Booking.Application.Appointments.Commands.CreateAppointment;
 using Booking.Application.Appointments.Dtos;
 using Booking.Application.Appointments.Queries.GetAppointmentById;
@@ -182,6 +183,27 @@ namespace Booking.API.Controllers
             [FromBody] string notes)
         {
             await _mediator.Send(new CompleteAppointmentCommand(id, notes));
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Confirms an existing appointment.
+        /// </summary>
+        /// <remarks>
+        /// Can only be performed by the assigned doctor or an admin.
+        /// The appointment must be in 'Pending' status.
+        /// </remarks>
+        /// <param name="id">Appointment ID</param>
+        /// <returns>No content</returns>
+        /// <response code="204">Success</response>
+        /// <response code="404">Appointment not found</response>
+        [HttpPost("{id}/confirm")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ConfirmAppointment(Guid id)
+        {
+            await _mediator.Send(new ConfirmAppointmentCommand(id));
+
             return NoContent();
         }
 
