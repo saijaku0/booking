@@ -11,7 +11,7 @@ namespace Booking.Domain.Entities
         public TimeSpan DayEnd { get; private set; }
         public TimeSpan LunchStart { get; private set; }
         public TimeSpan LunchEnd { get; private set; }
-
+        public virtual Doctor? Doctor { get; private set; }
         public IReadOnlyCollection<int> WorkingDays => _workingDays.AsReadOnly();
         private readonly List<int> _workingDays = new();
 

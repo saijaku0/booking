@@ -15,6 +15,7 @@ public class Doctor
     public string? Bio { get; private set; }
     public int ExperienceYears { get; private set; }
     public string? ImageUrl { get; private set; }
+    public virtual DoctorScheduleConfig? ScheduleConfig { get; private set; }
     public bool IsActive { get; private set; }
     [Column(TypeName = "decimal(18,2)")]
     public decimal ConsultationFee { get; private set; }
