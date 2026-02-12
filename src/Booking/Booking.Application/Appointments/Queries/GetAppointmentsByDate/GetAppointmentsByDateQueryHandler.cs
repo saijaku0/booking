@@ -22,7 +22,7 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentsByDate
             .Where(d => d.Id == request.DoctorId)
             .Select(d => new
             {
-                FullName = $"{d.Name} {d.Lastname}",
+                FullName = $"{d.ApplicationUser.FirstName} {d.ApplicationUser.LastName}",
                 Specialty = d.Specialty != null ? d.Specialty.Name : "General"
             })
             .FirstOrDefaultAsync(cancellationToken);
@@ -57,7 +57,7 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentsByDate
                     PatientName = patientName, 
 
                     Status = app.Status.ToString(),
-                    MedicalNotes = app.MedicalNotes,
+                    MedicalNotes = app.MedicalNotes ?? string.Empty,
                     StartTime = app.StartTime,
                     EndTime = app.EndTime
                 });

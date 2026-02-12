@@ -28,8 +28,8 @@ namespace Booking.Application.Doctors.Queries.GetDoctors
                 var term = getDoctorsQuery.SearchTerm.ToLower().Trim();
 
                 query = query.Where(d =>
-                    d.Name.ToLower().Contains(term) ||
-                    d.Lastname.ToLower().Contains(term));
+                    d.ApplicationUser.FirstName.ToLower().Contains(term) ||
+                    d.ApplicationUser.LastName.ToLower().Contains(term));
             }
 
             query = query
@@ -41,9 +41,9 @@ namespace Booking.Application.Doctors.Queries.GetDoctors
                 .Select(d => new DoctorDto
                 (
                     d.Id,
-                    d.UserId,
-                    d.Name,
-                    d.Lastname,
+                    d.ApplicationUserId,
+                    d.ApplicationUser.FirstName,
+                    d.ApplicationUser.LastName,
                     d.SpecialtyId,
                     d.ImageUrl,
                     d.AverageRating,

@@ -69,7 +69,7 @@ namespace Booking.Application.Appointments.Commands.CancelAppointment
             if (roles.Contains(Roles.Doctor))
             {
                 var doctor = await _bookingDbContext.Doctors
-                    .FirstOrDefaultAsync(d => d.UserId == currentUserId, cancellationToken) 
+                    .FirstOrDefaultAsync(d => d.ApplicationUserId == currentUserId, cancellationToken) 
                     ?? throw new UnauthorizedAccessException("Doctor profile not found.");
                 
                 if (doctor.Id != appointment.DoctorId)

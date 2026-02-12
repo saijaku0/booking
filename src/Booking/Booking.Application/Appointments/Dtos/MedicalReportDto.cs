@@ -6,5 +6,6 @@
         string PatientName,
         DateTime Date,
         string Diagnosis,
-        string Recommendations);
+        string? MedicalNotes,
+        string? TreatmentPlan);
 }

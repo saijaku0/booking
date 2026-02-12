@@ -21,9 +21,9 @@ namespace Booking.Application.Doctors.Queries.GetDoctorById
                 .Where(d => d.Id == request.Id)
                 .Select(s => new DoctorDto(
                     s.Id,
-                    s.UserId,
-                    s.Name,
-                    s.Lastname,
+                    s.ApplicationUserId,
+                    s.ApplicationUser.FirstName,
+                    s.ApplicationUser.LastName,
                     s.SpecialtyId,
                     s.ImageUrl,
                     s.Reviews.Any() ? s.Reviews.Average(r => r.Rating) : 0.0,

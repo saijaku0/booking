@@ -23,7 +23,7 @@ namespace Booking.Application.Doctors.Command.UpdateProfilePhoto
                 throw new UnauthorizedAccessException("User is not authorized.");
 
             var doctor = await _dbContext.Doctors
-                .FirstOrDefaultAsync(d => d.UserId == doctorId, cancellationToken)
+                .FirstOrDefaultAsync(d => d.ApplicationUserId == doctorId, cancellationToken)
                 ?? throw new KeyNotFoundException("Doctor not found.");
 
             var allowExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };

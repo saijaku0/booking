@@ -54,7 +54,7 @@ public class GetDoctorAppointmentsQueryHandler(
                 StartTime = app.StartTime,
                 EndTime = app.EndTime,
                 Status = app.Status.ToString(),
-                MedicalNotes = app.MedicalNotes
+                MedicalNotes = app.MedicalNotes ?? string.Empty
             });
         }
 
@@ -69,7 +69,7 @@ public class GetDoctorAppointmentsQueryHandler(
             throw new UnauthorizedAccessException("User is not logged in.");
 
         var doctorId = await _context.Doctors
-            .Where(d => d.UserId == currentUserId)
+            .Where(d => d.ApplicationUserId == currentUserId)
             .Select(d => d.Id)
             .FirstOrDefaultAsync(token);
 

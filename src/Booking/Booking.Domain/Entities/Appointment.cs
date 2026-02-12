@@ -18,12 +18,15 @@ public enum AttachmentType
 public class Appointment
 {
     public Guid Id { get; private set; }
-    public Guid DoctorId { get; private set; } 
+    public Guid DoctorId { get; private set; }
     public Guid CustomerId { get; private set; }
     public DateTime StartTime { get; private set; }
     public DateTime EndTime { get; private set; }
     public AppointmentStatus Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
+
+    public virtual Doctor Doctor { get; private set; } = null!;
+    public virtual Patient Patient { get; private set; } = null!;
 
     public string? MedicalNotes { get; private set; }
     public string? Diagnosis { get; private set; }
@@ -34,7 +37,10 @@ public class Appointment
 
     private Appointment() { }
 
-    public Appointment(Guid doctorId, Guid customerId, DateTime start, DateTime end)
+    public Appointment(Guid doctorId, 
+        Guid customerId, 
+        DateTime start, 
+        DateTime end)
     {
         if (start >= end)
             throw new ArgumentException("Start time must be before end time.");

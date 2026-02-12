@@ -14,18 +14,59 @@ public class BookingDbContext(DbContextOptions<BookingDbContext> options)
     public DbSet<Review> Reviews { get; set; }
     public DbSet<AppointmentAttachment> AppointmentAttachments { get; set; }
     public DbSet<DoctorScheduleConfig> DoctorScheduleConfigs { get; set; }
+    public DbSet<Patient> Patients { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Patient>(entity =>
+        {
+            entity.HasKey(p => p.Id);
+
+            entity.HasOne(p => p.ApplicationUser)
+                  .WithOne() 
+                  .HasForeignKey<Patient>(p => p.ApplicationUserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(p => p.Appointments)
+                  .WithOne()
+                  .HasForeignKey("PatientId") 
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Doctor>(entity =>
+        {
+            entity.HasKey(d => d.Id);
+
+            entity.HasOne(d => d.ApplicationUser)
+                  .WithOne()
+                  .HasForeignKey<Doctor>(d => d.ApplicationUserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(d => d.ScheduleConfig)
+                  .WithOne(c => c.Doctor)
+                  .HasForeignKey<DoctorScheduleConfig>(c => c.DoctorId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
         modelBuilder.Entity<Appointment>(builder =>
         {
             builder.HasKey(a => a.Id);
 
             builder.Property(a => a.Status)
-                .HasConversion<string>();
+                   .HasConversion<string>();
 
-            builder.Property(a => a.DoctorId).IsRequired();
-            builder.Property(a => a.CustomerId).IsRequired();
+            builder.HasMany(a => a.Attachments)
+                   .WithOne()
+                   .HasForeignKey("AppointmentId")
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne<Doctor>()
+                   .WithMany()
+                   .HasForeignKey(a => a.DoctorId);
+
+            builder.HasOne<Patient>()
+                   .WithMany(p => p.Appointments)
+                   .HasForeignKey("PatientId");
         });
 
         modelBuilder.Entity<DoctorScheduleConfig>(entity =>
@@ -34,7 +75,22 @@ public class BookingDbContext(DbContextOptions<BookingDbContext> options)
 
             entity.Property<List<int>>("_workingDays") 
                   .HasColumnName("WorkingDays")        
-                  .HasColumnType("integer[]");        
+                  .HasColumnType("integer[]");   
+        });
+
+        modelBuilder.Entity<Review>(entity =>
+        {
+            entity.HasKey(r => r.ReviewId);
+
+            entity.HasOne(r => r.Doctor)
+                  .WithMany(d => d.Reviews)
+                  .HasForeignKey(r => r.DoctorId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(r => r.Patient)
+                  .WithMany(p => p.Reviews) 
+                  .HasForeignKey(r => r.PatientId)
+                  .OnDelete(DeleteBehavior.Restrict); 
         });
 
         base.OnModelCreating(modelBuilder);

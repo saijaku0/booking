@@ -36,13 +36,11 @@ namespace Booking.Application.Doctors.Command.CreateDoctor
 
             var doctor = new Doctor
             (
-                createDoctor.Name,
-                createDoctor.Lastname,
+                user.Id,
                 createDoctor.SpecialtyId,
                 createDoctor.IsActive,
                 createDoctor.ConsultationFee,
                 createDoctor.ExperienceYears,
-                user.Id,
                 createDoctor.Bio,
                 createDoctor.ImageUrl
             );

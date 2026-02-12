@@ -5,9 +5,8 @@ namespace Booking.Domain.Entities;
 public class Doctor
 {
     public Guid Id { get; init; }
-    public string? UserId { get; init; } = null;
-    public string Name { get; private set; } = string.Empty;
-    public string Lastname {  get; private set; } = string.Empty;
+    public string ApplicationUserId { get; private set; } = null!;
+    public virtual ApplicationUser ApplicationUser { get; private set; } = null!;
     public Guid SpecialtyId { get; private set; }
     public Specialty Specialty { get; private set; } = null!;
     public double AverageRating { get; private set; }
@@ -25,21 +24,17 @@ public class Doctor
     private Doctor() { }
 
     public Doctor(
-        string name, 
-        string lastname, 
+        string applicationUserId,
         Guid specialtyId,
         bool isActive,
         decimal consultationFee, 
         int experienceYears,
-        string userId,
         string? bio,             
         string? imageUrl)
     {
         Id = Guid.NewGuid();
-        Name = name;
-        Lastname = lastname;
+        ApplicationUserId = applicationUserId;
         SpecialtyId = specialtyId;
-        UserId = userId;
         IsActive = isActive;
 
         ConsultationFee = consultationFee;
@@ -49,11 +44,6 @@ public class Doctor
 
         AverageRating = 0;
         ReviewsCount = 0;
-    }
-
-    public Doctor(string v1, string v2, Guid specialtyId, bool v3)
-    {
-        SpecialtyId = specialtyId;
     }
 
     public void UpdateProfile(
@@ -70,8 +60,6 @@ public class Doctor
         if (experienceYears < 0) 
             throw new ArgumentException("Experience cannot be negative");
 
-        Name = name;
-        Lastname = lastname;
         Bio = bio;
         ExperienceYears = experienceYears;
         ImageUrl = imageUrl;
@@ -93,8 +81,6 @@ public class Doctor
         AverageRating = Math.Round(totalScore / ReviewsCount, 2);
     }
 
-    public string GetFullName() => $"{Name} {Lastname}";
-    
     public void SetSpecialty(Guid specialtyId)
     {
         if (specialtyId == Guid.Empty)

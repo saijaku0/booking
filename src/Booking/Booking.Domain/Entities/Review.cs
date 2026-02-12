@@ -4,15 +4,19 @@
     {
         public Guid ReviewId { get; private set; }
         public Guid PatientId { get; private set; }
+        public virtual Patient Patient { get; private set; } = null!;
         public Guid DoctorId { get; private set; }
-        public Doctor Doctor { get; private set; } = null!;
+        public virtual Doctor Doctor { get; private set; } = null!;
         public int Rating { get; private set; }
         public string Text { get; private set; } = string.Empty;
         public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
         private Review() { }
 
-        public Review(Guid doctorId, Guid patientId, int rating, string text)
+        public Review(Guid doctorId, 
+            Guid patientId, 
+            int rating, 
+            string text)
         {
             if (rating < 1 || rating > 5)
                 throw new ArgumentOutOfRangeException(nameof(rating), "Rating must be between 1 and 5.");
