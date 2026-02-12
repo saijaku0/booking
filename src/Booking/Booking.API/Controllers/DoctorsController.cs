@@ -1,6 +1,8 @@
-﻿using Booking.Application.Doctors.Command.CreateDoctor;
+﻿using Booking.API.Dtos.Doctor;
+using Booking.Application.Doctors.Command.CreateDoctor;
 using Booking.Application.Doctors.Command.UpdateDoctor;
 using Booking.Application.Doctors.Command.UpdateProfilePhoto;
+using Booking.Application.Doctors.Command.UpdateScheduleConfig;
 using Booking.Application.Doctors.Dtos;
 using Booking.Application.Doctors.Queries.GetDoctorById;
 using Booking.Application.Doctors.Queries.GetDoctors;
@@ -165,6 +167,38 @@ namespace Booking.API.Controllers
         {
             var stats = await _mediator.Send(new GetDoctorStatsQuery(id, period));
             return Ok(stats);
+        }
+
+        /// <summary>
+        /// Updates the schedule configuration for the specified doctor.    
+        /// </summary>
+        /// <remarks>Only users with the Doctor or Admin role are authorized to perform this
+        /// operation.</remarks>
+        /// <param name="id">The unique identifier of the doctor whose schedule is being updated.</param>
+        /// <param name="request">An object containing the new schedule configuration details. Cannot be null.</param>
+        /// <returns>A response indicating the result of the update operation. Returns status code 204 (No Content) if the update
+        /// is successful.</returns>
+        /// <response code="204">Schedule updated successfully.</response>
+        [HttpPut("{id:guid}/schedule")]
+        [Authorize(Roles = Roles.Doctor + "," + Roles.Admin)] 
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> UpdateSchedule(
+            Guid id, 
+            [FromBody] UpdateScheduleRequest request)
+        {
+            var command = new UpdateScheduleConfigCommand(
+                id,
+                request.DayStart,
+                request.DayEnd,
+                request.LunchStart,
+                request.LunchEnd,
+                request.WorkingDays,
+                request.SlotDurationMinutes,
+                request.BufferMinutes
+            );
+
+            await _mediator.Send(command);
+            return NoContent();
         }
     }
 }
