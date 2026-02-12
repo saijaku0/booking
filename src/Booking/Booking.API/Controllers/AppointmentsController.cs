@@ -1,7 +1,9 @@
-﻿using Booking.Application.Appointments.Commands.CancelAppointment;
+﻿using Booking.API.Dtos.Appointment;
+using Booking.Application.Appointments.Commands.CancelAppointment;
 using Booking.Application.Appointments.Commands.CompleteAppointment;
 using Booking.Application.Appointments.Commands.ConfirmAppointment;
 using Booking.Application.Appointments.Commands.CreateAppointment;
+using Booking.Application.Appointments.Commands.RescheduleAppointment;
 using Booking.Application.Appointments.Dtos;
 using Booking.Application.Appointments.Queries.GetAppointmentById;
 using Booking.Application.Appointments.Queries.GetAppointmentReport;
@@ -75,7 +77,7 @@ namespace Booking.API.Controllers
         /// <returns>List of booking</returns>
         /// <response code="200">Successful request. Returns a list (may be empty)</response>
         [HttpGet]
-        [Authorize(Roles = Roles.Admin)]
+        [Authorize(Roles = Roles.Admin + "," + Roles.Doctor)]
         [ProducesResponseType(typeof(List<AppointmentDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<AppointmentDto>>> GetAppointmentsByDateQuery(
             [FromQuery] Guid doctorId,
@@ -248,6 +250,31 @@ namespace Booking.API.Controllers
             var result = await _mediator.Send(query);
 
             return File(result.Content, result.ContentType, result.FileName);
+        }
+
+        /// <summary>
+        /// Reschedules an existing appointment with new start and end times.   
+        /// </summary>
+        /// <remarks>This action is restricted to users with the Doctor role. The appointment must exist
+        /// and be eligible for rescheduling.</remarks>
+        /// <param name="id">The unique identifier of the appointment to reschedule.</param>
+        /// <param name="request">The request containing the new start and end times for the appointment. Cannot be null.</param>
+        /// <returns>An HTTP 204 No Content response if the appointment is successfully rescheduled.</returns>
+        /// <response code="204">The appointment was successfully rescheduled.</response>
+        /// <response code="400">The request is invalid, such as missing required fields or invalid date formats.</response>
+        /// <response code="404">No appointment was found with the specified ID.</response>
+        [HttpPut("{id}/reschedule")]
+        [Authorize(Roles = Roles.Doctor)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Reschedule(
+            Guid id,
+            [FromBody] RescheduleAppointmentRequest request)
+        {
+            await _mediator.Send(new RescheduleAppointmentCommand(id, 
+                request.StartTime, request.EndTime));
+            return NoContent();
         }
     }
 }

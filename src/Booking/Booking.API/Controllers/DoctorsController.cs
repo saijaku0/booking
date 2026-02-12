@@ -4,11 +4,11 @@ using Booking.Application.Doctors.Command.UpdateProfilePhoto;
 using Booking.Application.Doctors.Dtos;
 using Booking.Application.Doctors.Queries.GetDoctorById;
 using Booking.Application.Doctors.Queries.GetDoctors;
+using Booking.Application.Doctors.Queries.GetDoctorStats;
 using Booking.Domain.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Booking.API.Controllers
 {
@@ -141,6 +141,30 @@ namespace Booking.API.Controllers
         {
             var doctor = await _mediator.Send(new GetDoctorByIdQuery(id));
             return Ok(doctor);
+        }
+
+        /// <summary>
+        /// Retrieves statistics for a specific doctor over a given period.
+        /// </summary>
+        /// <remarks> 
+        /// This endpoint allows you to retrieve statistics for a specific doctor over a specified period.
+        /// The period can be "day", "week", or "month".
+        /// </remarks>
+        /// <param name="id">Doctor ID</param>
+        /// <param name="period">The period for which to retrieve statistics (day, week, month)</param>
+        /// <returns>Doctor statistics</returns>
+        /// <response code="200">Returns the doctor statistics</response>
+        /// <response code="404">If the doctor was not found</response>
+        [HttpGet("{id:guid}/stats")]
+        [Authorize(Roles = Roles.Doctor + "," + Roles.Admin)]
+        [ProducesResponseType(typeof(DoctorStatsDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<DoctorStatsDto>> GetDoctorStats(
+            Guid id, 
+            [FromQuery] string period)
+        {
+            var stats = await _mediator.Send(new GetDoctorStatsQuery(id, period));
+            return Ok(stats);
         }
     }
 }

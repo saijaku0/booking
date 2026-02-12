@@ -67,4 +67,16 @@ public class Appointment
         MedicalNotes = notes;
         Status = AppointmentStatus.Completed;
     }
+
+    public void Reschedule(DateTime newStart, DateTime newEnd)
+    {
+        if (Status == AppointmentStatus.Canceled)
+            throw new InvalidOperationException("Cannot reschedule a canceled appointment.");
+        if (newStart >= newEnd)
+            throw new ArgumentException("Start time must be before end time.");
+
+        StartTime = newStart;
+        EndTime = newEnd;
+        Status = AppointmentStatus.Pending; 
+    }
 }
