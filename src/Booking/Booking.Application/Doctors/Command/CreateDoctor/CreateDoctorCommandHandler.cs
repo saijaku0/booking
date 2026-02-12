@@ -4,7 +4,6 @@ using Booking.Domain.Constants;
 using Booking.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Booking.Application.Doctors.Command.CreateDoctor
 {
