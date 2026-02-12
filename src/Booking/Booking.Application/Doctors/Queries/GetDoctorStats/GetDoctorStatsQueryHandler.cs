@@ -17,26 +17,28 @@ namespace Booking.Application.Doctors.Queries.GetDoctorStats
             GetDoctorStatsQuery request, 
             CancellationToken cancellationToken)
         {
+            var now = DateTime.UtcNow;
+
             DateTime startDate = DateTime.UtcNow;
             DateTime endDate = DateTime.UtcNow;
 
             switch (request.Period.ToLower())
             {
                 case "day":
-                    startDate = DateTime.UtcNow.Date;
-                    endDate = startDate.AddDays(1);
+                    startDate = DateTime.SpecifyKind(now.Date, DateTimeKind.Utc);
+                    endDate = startDate.AddDays(1).AddTicks(-1);
                     break;
                 case "week":
-                    int diff = (7 + (DateTime.UtcNow.DayOfWeek - DayOfWeek.Monday)) % 7;
-                    startDate = DateTime.UtcNow.AddDays(-1 * diff).Date;
-                    endDate = startDate.AddDays(7);
+                    var diff = (7 + (now.DayOfWeek - DayOfWeek.Monday)) % 7;
+                    var startOfWeek = now.AddDays(-1 * diff).Date;
+                    startDate = DateTime.SpecifyKind(startOfWeek, DateTimeKind.Utc);
+                    endDate = startDate.AddDays(7).AddTicks(-1);
                     break;
                 case "month":
-                    startDate = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
-                    endDate = startDate.AddMonths(1);
-                    break;
                 default:
-                    throw new ArgumentException("Invalid period specified. Use 'day', 'week', or 'month'.");
+                    startDate = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+                    endDate = startDate.AddMonths(1).AddTicks(-1);
+                    break;
             }
 
             var doctorFee = await _dbContext.Doctors
