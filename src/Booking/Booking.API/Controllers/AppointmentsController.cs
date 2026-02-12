@@ -172,7 +172,9 @@ namespace Booking.API.Controllers
         /// The appointment must be in 'Confirmed' status.
         /// </remarks>
         /// <param name="id">Appointment ID</param>
-        /// <param name="notes">Doctor medical notes</param>
+        /// <param name="diagnosis">Doctor medical diagnosis</param>
+        /// <param name="medicalNotes">Doctor medical notes</param>
+        /// <param name="treatmentPlan">Doctor treatment plan</param>
         /// <response code="204">Success</response>
         /// <response code="400">Invalid status (e.g. already canceled)</response>
         /// <response code="403">Not authorized to complete this appointment</response>
@@ -182,9 +184,11 @@ namespace Booking.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CompleteAppointment(
             Guid id,
-            [FromBody] string notes)
+            [FromBody] CompleteAppointmentCommand command) 
         {
-            await _mediator.Send(new CompleteAppointmentCommand(id, notes));
+            if (id != command.AppointmentId) return BadRequest();
+
+            await _mediator.Send(command);
             return NoContent();
         }
 

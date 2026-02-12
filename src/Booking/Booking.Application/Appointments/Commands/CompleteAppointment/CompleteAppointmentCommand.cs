@@ -4,6 +4,8 @@ namespace Booking.Application.Appointments.Commands.CompleteAppointment
 {
     public record CompleteAppointmentCommand(
         Guid AppointmentId,
-        string MedicalNotes
+        string Diagnosis,
+        string? MedicalNotes,
+        string? TreatmentPlan
         ) : IRequest;
 }

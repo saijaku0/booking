@@ -1,5 +1,4 @@
-﻿using Booking.Application.Common.Extension;
-using Booking.Application.Common.Interfaces;
+﻿using Booking.Application.Common.Interfaces;
 using Booking.Application.Doctors.Dtos;
 using Booking.Domain.Entities;
 using MediatR;
@@ -15,7 +14,7 @@ namespace Booking.Application.Doctors.Queries.GetDoctorSlots
             GetDoctorSlotsQuery request, 
             CancellationToken cancellationToken)
         {
-            var config = dbContext.DoctorScheduleConfigs
+            var config = _dbContext.DoctorScheduleConfigs
                 .AsNoTracking()
                 .FirstOrDefault(x => x.DoctorId == request.DoctorId)
                 ?? throw new KeyNotFoundException("Doctor schedule config not found.");

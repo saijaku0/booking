@@ -1,15 +1,20 @@
-﻿using Booking.Domain.Entities;
+﻿using Booking.Application.Common.Exceptions;
+using Booking.Application.Common.Interfaces;
+using Booking.Domain.Constants;
+using Booking.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Booking.Domain.Constants;
-using Booking.Application.Common.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Booking.Application.Identity.Commands.RegisterUser
 {
-    public class RegisterUserCommandHandler(UserManager<ApplicationUser> user) 
+    public class RegisterUserCommandHandler(
+        UserManager<ApplicationUser> userManager,
+        IBookingDbContext dbContext) 
         : IRequestHandler<RegisterUserCommand, string>
     {
-        private readonly UserManager<ApplicationUser> _user = user;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly IBookingDbContext _dbContext = dbContext;
 
         public async Task<string> Handle(
             RegisterUserCommand request, 
@@ -21,13 +26,31 @@ namespace Booking.Application.Identity.Commands.RegisterUser
                 LastName = request.UserSurname,
                 Email = request.UserEmail,
                 UserName = request.UserEmail,
+                PhoneNumber = request.PhoneNumber,
+                EmailConfirmed = true 
             };
 
-            (await _user.CreateAsync(user, request.UserPassword))
-                .EnsureSucceeded("Registration");
+            var createResult = await _userManager.CreateAsync(user, request.UserPassword);
 
-            (await _user.AddToRoleAsync(user, Roles.Patient))
-                .EnsureSucceeded("RoleAssignment");
+            if (!createResult.Succeeded)
+            {
+                var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                throw new Exception($"Registration failed: {errors}");
+            }
+
+            var roleResult = await _userManager.AddToRoleAsync(user, Roles.Patient);
+            if (!roleResult.Succeeded) throw new Exception("Failed to assign role");
+
+            var patient = new Patient(
+                user.Id,                
+                request.DateOfBirth,
+                request.Gender,
+                request.PhoneNumber
+            );
+
+            _dbContext.Patients.Add(patient);
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return user.Id;
         }

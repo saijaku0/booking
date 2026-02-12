@@ -29,8 +29,8 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentReport
                         select new
                         {
                             Appointment = a,
-                            DoctorName = $"{d.Name} {d.Lastname}",
-                            DoctorUserId = d.UserId, 
+                            DoctorName = $"{d.ApplicationUser.FirstName} {d.ApplicationUser.LastName}",
+                            DoctorUserId = d.ApplicationUserId, 
                             SpecialtyName = s.Name,
                             PatientId = a.CustomerId
                         };
@@ -66,7 +66,8 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentReport
                 PatientName: patientName,
                 Date: data.Appointment.StartTime,
                 Diagnosis: data.Appointment.MedicalNotes ?? "No notes.",
-                Recommendations: "Standard recovery procedures."
+                MedicalNotes: data.Appointment.MedicalNotes ?? string.Empty,
+                TreatmentPlan: "Standard recovery procedures."
             );
 
             var fileContent = _pdfGenerator.GenerateMedicalReport(reportData);

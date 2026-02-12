@@ -29,7 +29,7 @@ namespace Booking.Application.Doctors.Command.UpdateDoctor
             if (string.IsNullOrEmpty(currentDoctorId))
                 throw new UnauthorizedAccessException();
 
-            var isOwner = doctor.UserId == currentDoctorId;
+            var isOwner = doctor.ApplicationUserId == currentDoctorId;
             var currentUser = await _userManager.FindByIdAsync(currentDoctorId);
             var isAdmin = currentUser != null && await _userManager.IsInRoleAsync(currentUser, Roles.Admin);
 

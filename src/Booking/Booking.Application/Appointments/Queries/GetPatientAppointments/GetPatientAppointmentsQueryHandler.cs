@@ -1,5 +1,6 @@
 ﻿using Booking.Application.Appointments.Dtos;
 using Booking.Application.Common.Interfaces;
+using Booking.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,7 +39,7 @@ namespace Booking.Application.Appointments.Queries.GetPatientAppointments
                     StartTime = appointment.StartTime,
                     EndTime = appointment.EndTime,
                     Status = appointment.Status.ToString(),
-                    DoctorName = $"{doctor.Name} {doctor.Lastname}",
+                    DoctorName = $"{doctor.ApplicationUser.FirstName} {doctor.ApplicationUser.LastName}",
                     Specialty = specialty.Name
                 };
 

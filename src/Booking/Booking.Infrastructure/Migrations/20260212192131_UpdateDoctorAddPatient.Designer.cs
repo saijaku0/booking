@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Booking.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Booking.Infrastructure.Migrations
 {
     [DbContext(typeof(BookingDbContext))]
-    partial class BookingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260212192131_UpdateDoctorAddPatient")]
+    partial class UpdateDoctorAddPatient
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -116,9 +119,6 @@ namespace Booking.Infrastructure.Migrations
                     b.Property<Guid>("DoctorId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("DoctorId1")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("timestamp with time zone");
 
@@ -126,9 +126,6 @@ namespace Booking.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<Guid>("PatientId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("PatientId1")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("StartTime")
@@ -145,11 +142,7 @@ namespace Booking.Infrastructure.Migrations
 
                     b.HasIndex("DoctorId");
 
-                    b.HasIndex("DoctorId1");
-
                     b.HasIndex("PatientId");
-
-                    b.HasIndex("PatientId1");
 
                     b.ToTable("Appointments");
                 });
@@ -195,9 +188,6 @@ namespace Booking.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ApplicationUserId1")
-                        .HasColumnType("text");
-
                     b.Property<double>("AverageRating")
                         .HasColumnType("double precision");
 
@@ -225,9 +215,6 @@ namespace Booking.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId")
-                        .IsUnique();
-
-                    b.HasIndex("ApplicationUserId1")
                         .IsUnique();
 
                     b.HasIndex("SpecialtyId");
@@ -294,9 +281,6 @@ namespace Booking.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ApplicationUserId1")
-                        .HasColumnType("text");
-
                     b.Property<DateOnly>("DateOfBirth")
                         .HasColumnType("date");
 
@@ -309,9 +293,6 @@ namespace Booking.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId")
-                        .IsUnique();
-
-                    b.HasIndex("ApplicationUserId1")
                         .IsUnique();
 
                     b.ToTable("Patients");
@@ -342,8 +323,6 @@ namespace Booking.Infrastructure.Migrations
                     b.HasKey("ReviewId");
 
                     b.HasIndex("DoctorId");
-
-                    b.HasIndex("PatientId");
 
                     b.ToTable("Reviews");
                 });
@@ -503,27 +482,15 @@ namespace Booking.Infrastructure.Migrations
 
             modelBuilder.Entity("Booking.Domain.Entities.Appointment", b =>
                 {
-                    b.HasOne("Booking.Domain.Entities.Doctor", null)
+                    b.HasOne("Booking.Domain.Entities.Doctor", "Doctor")
                         .WithMany()
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Booking.Domain.Entities.Doctor", "Doctor")
-                        .WithMany()
-                        .HasForeignKey("DoctorId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Booking.Domain.Entities.Patient", null)
+                    b.HasOne("Booking.Domain.Entities.Patient", "Patient")
                         .WithMany("Appointments")
                         .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Booking.Domain.Entities.Patient", "Patient")
-                        .WithMany()
-                        .HasForeignKey("PatientId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -544,14 +511,10 @@ namespace Booking.Infrastructure.Migrations
             modelBuilder.Entity("Booking.Domain.Entities.Doctor", b =>
                 {
                     b.HasOne("Booking.Domain.Entities.ApplicationUser", "ApplicationUser")
-                        .WithOne()
+                        .WithOne("DoctorProfile")
                         .HasForeignKey("Booking.Domain.Entities.Doctor", "ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Booking.Domain.Entities.ApplicationUser", null)
-                        .WithOne("DoctorProfile")
-                        .HasForeignKey("Booking.Domain.Entities.Doctor", "ApplicationUserId1");
 
                     b.HasOne("Booking.Domain.Entities.Specialty", "Specialty")
                         .WithMany()
@@ -578,14 +541,10 @@ namespace Booking.Infrastructure.Migrations
             modelBuilder.Entity("Booking.Domain.Entities.Patient", b =>
                 {
                     b.HasOne("Booking.Domain.Entities.ApplicationUser", "ApplicationUser")
-                        .WithOne()
+                        .WithOne("PatientProfile")
                         .HasForeignKey("Booking.Domain.Entities.Patient", "ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Booking.Domain.Entities.ApplicationUser", null)
-                        .WithOne("PatientProfile")
-                        .HasForeignKey("Booking.Domain.Entities.Patient", "ApplicationUserId1");
 
                     b.Navigation("ApplicationUser");
                 });
@@ -598,15 +557,7 @@ namespace Booking.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Booking.Domain.Entities.Patient", "Patient")
-                        .WithMany("Reviews")
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Doctor");
-
-                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -682,8 +633,6 @@ namespace Booking.Infrastructure.Migrations
             modelBuilder.Entity("Booking.Domain.Entities.Patient", b =>
                 {
                     b.Navigation("Appointments");
-
-                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }
