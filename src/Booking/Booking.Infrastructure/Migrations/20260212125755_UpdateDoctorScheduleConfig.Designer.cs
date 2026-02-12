@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Booking.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Booking.Infrastructure.Migrations
 {
     [DbContext(typeof(BookingDbContext))]
-    partial class BookingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260212125755_UpdateDoctorScheduleConfig")]
+    partial class UpdateDoctorScheduleConfig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -244,9 +247,6 @@ namespace Booking.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DoctorId")
-                        .IsUnique();
-
                     b.ToTable("DoctorScheduleConfigs");
                 });
 
@@ -452,17 +452,6 @@ namespace Booking.Infrastructure.Migrations
                     b.Navigation("Specialty");
                 });
 
-            modelBuilder.Entity("Booking.Domain.Entities.DoctorScheduleConfig", b =>
-                {
-                    b.HasOne("Booking.Domain.Entities.Doctor", "Doctor")
-                        .WithOne("ScheduleConfig")
-                        .HasForeignKey("Booking.Domain.Entities.DoctorScheduleConfig", "DoctorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Doctor");
-                });
-
             modelBuilder.Entity("Booking.Domain.Entities.Review", b =>
                 {
                     b.HasOne("Booking.Domain.Entities.Doctor", "Doctor")
@@ -533,8 +522,6 @@ namespace Booking.Infrastructure.Migrations
             modelBuilder.Entity("Booking.Domain.Entities.Doctor", b =>
                 {
                     b.Navigation("Reviews");
-
-                    b.Navigation("ScheduleConfig");
                 });
 #pragma warning restore 612, 618
         }

@@ -17,9 +17,6 @@ public class BookingDbContext(DbContextOptions<BookingDbContext> options)
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<DoctorScheduleConfig>()
-            .HasKey(x => x.Id);
-
         modelBuilder.Entity<Appointment>(builder =>
         {
             builder.HasKey(a => a.Id);
@@ -29,6 +26,15 @@ public class BookingDbContext(DbContextOptions<BookingDbContext> options)
 
             builder.Property(a => a.DoctorId).IsRequired();
             builder.Property(a => a.CustomerId).IsRequired();
+        });
+
+        modelBuilder.Entity<DoctorScheduleConfig>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property<List<int>>("_workingDays") 
+                  .HasColumnName("WorkingDays")        
+                  .HasColumnType("integer[]");        
         });
 
         base.OnModelCreating(modelBuilder);

@@ -34,10 +34,11 @@ namespace Booking.Application.Doctors.Queries.GetDoctorSlots
             var now = DateTime.UtcNow;
 
             var existingAppointments = await _dbContext.Appointments
-            .AsNoTracking()
-            .Where(a => a.Status != AppointmentStatus.Canceled) 
-            .WhereOverlaps(request.DoctorId, workStart, workEnd)
-            .ToListAsync(cancellationToken);
+                .AsNoTracking()
+                .Where(a => a.DoctorId == request.DoctorId)
+                .Where(a => a.Status != AppointmentStatus.Canceled)
+                .Where(a => a.StartTime < workEnd && a.EndTime > workStart)
+                .ToListAsync(cancellationToken);
 
             var availableSlots = new List<DoctorTimeSlotDto>();
             var currentSlotStart = workStart;
