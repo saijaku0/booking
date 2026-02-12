@@ -23,6 +23,18 @@ namespace Booking.Domain.Entities
 
         private Patient() { }
 
+        public Patient(string applicationUserId, 
+            DateOnly dateOfBirth, 
+            Gender gender, 
+            string? phoneNumber)
+        {
+            Id = Guid.NewGuid();
+            ApplicationUserId = applicationUserId;
+            DateOfBirth = dateOfBirth;
+            Gender = gender;
+            PhoneNumber = phoneNumber;
+        }
+
         public IReadOnlyCollection<Appointment> GetCompletedAppointments()
         {
             return Appointments

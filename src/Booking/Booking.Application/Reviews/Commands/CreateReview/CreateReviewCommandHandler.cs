@@ -16,27 +16,34 @@ namespace Booking.Application.Reviews.Commands.CreateReview
             CreateReviewCommand request,
             CancellationToken cancellationToken)
         {
-            var userIdString = _currentUser.UserId;
+            var userId = _currentUser.UserId;
 
-            if (string.IsNullOrEmpty(userIdString))
+            if (string.IsNullOrEmpty(userId))
                 throw new UnauthorizedAccessException("User is not authorized to create reviews.");
 
-            if (!Guid.TryParse(userIdString, out var patientId))
-                throw new UnauthorizedAccessException("Invalid User ID format.");
+            var patientId = await _context.Patients
+                .AsNoTracking()
+                .Where(p => p.ApplicationUserId == userId)
+                .Select(p => p.Id)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            var doctor = await _context.Doctors
-                .Include(d => d.Reviews)
-                .FirstOrDefaultAsync(d => d.Id == request.DoctorId, cancellationToken)
-                    ?? throw new KeyNotFoundException($"Doctor with ID {request.DoctorId} not found.");
+            if (patientId == Guid.Empty)
+                throw new UnauthorizedAccessException("Patient profile not found.");
+
+            var doctorExists = await _context.Doctors
+                .AnyAsync(d => d.Id == request.DoctorId, cancellationToken);
+
+            if (!doctorExists)
+                throw new KeyNotFoundException($"Doctor with ID {request.DoctorId} not found.");
 
             var review = new Review(
-                doctor.Id,
+                request.DoctorId,
                 patientId,
                 request.Rating,
                 request.Text
             );
 
-            doctor.AddReview(review);
+            _context.Reviews.Add(review);
 
             await _context.SaveChangesAsync(cancellationToken);
 

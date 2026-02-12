@@ -11,6 +11,7 @@ namespace Booking.Application.Common.Interfaces
         DbSet<Review> Reviews { get; }
         DbSet<AppointmentAttachment> AppointmentAttachments { get; }
         DbSet<DoctorScheduleConfig> DoctorScheduleConfigs { get; }
+        DbSet<Patient> Patients { get; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }
 }

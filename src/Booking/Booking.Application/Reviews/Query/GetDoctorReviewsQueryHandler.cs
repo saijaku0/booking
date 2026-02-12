@@ -18,25 +18,24 @@ namespace Booking.Application.Reviews.Query
         {
             var reviews = await _context.Reviews
                 .AsNoTracking()
+                .Include(r => r.Patient)
+                .ThenInclude(p => p.ApplicationUser)
                 .Where(r => r.DoctorId == request.Id)
                 .OrderByDescending(r => r.CreatedAt)
+                .Select(r => new ReviewDto(
+
+                    Id: r.ReviewId,
+                    PatientName: r.Patient.ApplicationUser != null
+                        ? $"{r.Patient.ApplicationUser.FirstName} {r.Patient.ApplicationUser.LastName}"
+                        : "Anonymous", 
+                    Rating: r.Rating,
+                    Text: r.Text,
+                    CreatedAt: r.CreatedAt
+                    )
+                )
                 .ToListAsync(cancellationToken);
 
-            var res = new List<ReviewDto>();
-
-            foreach (var r in reviews) {
-                var patient = await _identityService.GetUserNameAsync(r.PatientId.ToString())
-                    ?? "Anonymous";
-                res.Add(new ReviewDto(
-                    r.ReviewId,
-                    patient,
-                    r.Rating,
-                    r.Text,
-                    r.CreatedAt
-                ));
-            }
-
-            return res;
+            return reviews;
         }
     }
 }
