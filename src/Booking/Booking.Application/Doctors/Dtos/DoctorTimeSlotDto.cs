@@ -1,6 +1,6 @@
 ﻿namespace Booking.Application.Doctors.Dtos
 {
-    public class TimeSlotDto
+    public class DoctorTimeSlotDto
     {
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
