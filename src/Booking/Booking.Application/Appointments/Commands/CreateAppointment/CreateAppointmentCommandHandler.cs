@@ -16,6 +16,7 @@ namespace Booking.Application.Appointments.Commands.CreateAppointment
         public async Task<Guid> Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
         {
             var isOverLap = await _context.Appointments
+                .Where(a => a.Status != AppointmentStatus.Canceled)
                 .WhereOverlaps(request.DoctorId,
                     request.StartTime,
                     request.EndTime)

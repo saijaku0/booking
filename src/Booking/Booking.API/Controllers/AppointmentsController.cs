@@ -75,7 +75,7 @@ namespace Booking.API.Controllers
         /// <returns>List of booking</returns>
         /// <response code="200">Successful request. Returns a list (may be empty)</response>
         [HttpGet]
-        [Authorize(Roles = Roles.Admin)]
+        [Authorize(Roles = Roles.Admin + "," + Roles.Doctor)]
         [ProducesResponseType(typeof(List<AppointmentDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<AppointmentDto>>> GetAppointmentsByDateQuery(
             [FromQuery] Guid doctorId,
