@@ -13,9 +13,13 @@ public class BookingDbContext(DbContextOptions<BookingDbContext> options)
     public DbSet<Specialty> Specialties { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<AppointmentAttachment> AppointmentAttachments { get; set; }
+    public DbSet<DoctorScheduleConfig> DoctorScheduleConfigs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<DoctorScheduleConfig>()
+            .HasKey(x => x.Id);
+
         modelBuilder.Entity<Appointment>(builder =>
         {
             builder.HasKey(a => a.Id);

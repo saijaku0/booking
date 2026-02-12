@@ -1,9 +1,12 @@
-﻿using Booking.Application.Doctors.Command.CreateDoctor;
+﻿using Booking.API.Dtos.Doctor;
+using Booking.Application.Doctors.Command.CreateDoctor;
 using Booking.Application.Doctors.Command.UpdateDoctor;
 using Booking.Application.Doctors.Command.UpdateProfilePhoto;
+using Booking.Application.Doctors.Command.UpdateScheduleConfig;
 using Booking.Application.Doctors.Dtos;
 using Booking.Application.Doctors.Queries.GetDoctorById;
 using Booking.Application.Doctors.Queries.GetDoctors;
+using Booking.Application.Doctors.Queries.GetDoctorSlots;
 using Booking.Application.Doctors.Queries.GetDoctorStats;
 using Booking.Domain.Constants;
 using MediatR;
@@ -160,11 +163,65 @@ namespace Booking.API.Controllers
         [ProducesResponseType(typeof(DoctorStatsDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<DoctorStatsDto>> GetDoctorStats(
-            Guid id, 
+            Guid id,
             [FromQuery] string period)
         {
             var stats = await _mediator.Send(new GetDoctorStatsQuery(id, period));
             return Ok(stats);
+        }
+
+        /// <summary>
+        /// Updates the schedule configuration for the specified doctor.    
+        /// </summary>
+        /// <remarks>Only users with the Doctor or Admin role are authorized to perform this
+        /// operation.</remarks>
+        /// <param name="id">The unique identifier of the doctor whose schedule is being updated.</param>
+        /// <param name="request">An object containing the new schedule configuration details. Cannot be null.</param>
+        /// <returns>A response indicating the result of the update operation. Returns status code 204 (No Content) if the update
+        /// is successful.</returns>
+        /// <response code="204">Schedule updated successfully.</response>
+        [HttpPut("{id:guid}/schedule")]
+        [Authorize(Roles = Roles.Doctor + "," + Roles.Admin)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> UpdateSchedule(
+            Guid id,
+            [FromBody] UpdateScheduleRequest request)
+        {
+            var command = new UpdateScheduleConfigCommand(
+                id,
+                request.DayStart,
+                request.DayEnd,
+                request.LunchStart,
+                request.LunchEnd,
+                request.WorkingDays,
+                request.SlotDurationMinutes,
+                request.BufferMinutes
+            );
+
+            await _mediator.Send(command);
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Retrieves the list of available time slots for a specified doctor on a given date.  
+        /// </summary>
+        /// <remarks>This endpoint is accessible without authentication. Use this method to display or
+        /// select available appointment times for a doctor.</remarks>
+        /// <param name="id">The unique identifier of the doctor whose available time slots are to be retrieved.</param>
+        /// <param name="date">The date for which to retrieve the doctor's available time slots.</param>
+        /// <returns>An HTTP 200 response containing a list of available time slots for the specified doctor on the given date.
+        /// The list is empty if no slots are available.</returns>
+        /// <response code="200">Returns the list of available time slots for the specified doctor on the given date.</response>
+        [HttpGet("{id:guid}/slots")]
+        [ProducesResponseType(typeof(List<DoctorTimeSlotDto>), StatusCodes.Status200OK)]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<DoctorTimeSlotDto>>> GetDoctorSlots(
+            Guid id,
+            [FromQuery] DateTime date)
+        {
+            var query = new GetDoctorSlotsQuery(id, date);
+            var slots = await _mediator.Send(query);
+            return Ok(slots);
         }
     }
 }

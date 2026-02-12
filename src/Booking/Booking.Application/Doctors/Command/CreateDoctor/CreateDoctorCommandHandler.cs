@@ -1,12 +1,11 @@
 ﻿using Booking.Application.Common.Exceptions;
 using Booking.Application.Common.Interfaces;
-using Booking.Application.Doctors.Command.CreateDoctor;
 using Booking.Domain.Constants;
 using Booking.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
-namespace Booking.Application.Admin.Commands.CreateDoctor
+namespace Booking.Application.Doctors.Command.CreateDoctor
 {
     public class CreateDoctorCommandHandler (
         IBookingDbContext dbContext, 
@@ -49,6 +48,11 @@ namespace Booking.Application.Admin.Commands.CreateDoctor
             );
 
             _dbContext.Doctors.Add(doctor);
+
+            var defaultConfig = new DoctorScheduleConfig(doctor.Id);
+
+            _dbContext.DoctorScheduleConfigs.Add(defaultConfig);
+
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return doctor.Id;
