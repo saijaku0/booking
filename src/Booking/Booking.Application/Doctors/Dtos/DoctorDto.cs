@@ -6,6 +6,7 @@
         string Name,
         string Lastname,
         Guid SpecialtyId,
+        string PhoneNumber,
         string? ImageUrl,
         double AverageRating,
         int ReviewCount,
