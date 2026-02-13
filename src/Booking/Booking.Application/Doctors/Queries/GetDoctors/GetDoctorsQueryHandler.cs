@@ -45,6 +45,7 @@ namespace Booking.Application.Doctors.Queries.GetDoctors
                     d.ApplicationUser.FirstName,
                     d.ApplicationUser.LastName,
                     d.SpecialtyId,
+                    d.ApplicationUser.PhoneNumber ?? string.Empty,
                     d.ImageUrl,
                     d.AverageRating,
                     d.ReviewsCount,
