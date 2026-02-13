@@ -27,6 +27,7 @@ namespace Booking.Application.Identity.Commands.RegisterUser
                 Email = request.UserEmail,
                 UserName = request.UserEmail,
                 PhoneNumber = request.PhoneNumber,
+                Address = request.Address,
                 EmailConfirmed = true 
             };
 
@@ -45,7 +46,8 @@ namespace Booking.Application.Identity.Commands.RegisterUser
                 user.Id,                
                 request.DateOfBirth,
                 request.Gender,
-                request.PhoneNumber
+                request.PhoneNumber,
+                request.Address
             );
 
             _dbContext.Patients.Add(patient);

@@ -1,4 +1,5 @@
 ﻿
+using Booking.Domain.Constants;
 using MediatR;
 
 namespace Booking.Application.Identity.Commands.RegisterUser
@@ -10,6 +11,7 @@ namespace Booking.Application.Identity.Commands.RegisterUser
     string UserPassword,
     DateOnly DateOfBirth,
     Gender Gender,
-    string? PhoneNumber
+    string? PhoneNumber,
+    string? Address
 ) : IRequest<string>;
 }

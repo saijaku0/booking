@@ -3,6 +3,6 @@ using MediatR;
 
 namespace Booking.Application.Patients.Queries.GetPatientProfile
 {
-    public record GetPatientProfileQuery : IRequest<PatientProfileDto>;
+    public record GetPatientProfileQuery() : IRequest<PatientProfileDto>;
 
 }

@@ -25,12 +25,17 @@ namespace Booking.Application.Patients.Queries.GetPatientProfile
                 .FirstOrDefaultAsync(p => p.ApplicationUserId == userId, cancellationToken)
                 ?? throw new UnauthorizedAccessException("Patient profile not found.");
 
+            var userFirstName = patient.ApplicationUser?.FirstName ?? "Unknown";
+            var userLastName = patient.ApplicationUser?.LastName ?? "User";
+            var userEmail = patient.ApplicationUser?.Email ?? string.Empty;
+            var userPhoto = patient.ApplicationUser?.PhotoUrl;
+
             return new PatientProfileDto
             {
                 Id = patient.Id,
-                FullName = $"{patient.ApplicationUser!.FirstName} {patient.ApplicationUser.LastName}",
-                Email = patient.ApplicationUser?.Email ?? string.Empty,
-                PhotoUrl = patient.ApplicationUser?.PhotoUrl,
+                FullName = $"{userFirstName} {userLastName}",
+                Email = userEmail,
+                PhotoUrl = userPhoto,
                 PhoneNumber = patient.PhoneNumber,
                 DateOfBirth = patient.DateOfBirth,
                 Gender = patient.Gender.ToString(),

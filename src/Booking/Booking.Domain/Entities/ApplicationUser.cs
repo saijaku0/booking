@@ -7,6 +7,7 @@ namespace Booking.Domain.Entities
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string? PhotoUrl { get; set; }
+        public string? Address { get; set; }
 
         public virtual Patient? PatientProfile { get; set; }
         public virtual Doctor? DoctorProfile { get; set; }

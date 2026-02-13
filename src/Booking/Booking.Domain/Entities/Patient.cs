@@ -1,8 +1,5 @@
-﻿public enum Gender
-{
-    Male,
-    Female,
-}
+﻿
+using Booking.Domain.Constants;
 
 namespace Booking.Domain.Entities
 {
@@ -26,13 +23,15 @@ namespace Booking.Domain.Entities
         public Patient(string applicationUserId, 
             DateOnly dateOfBirth, 
             Gender gender, 
-            string? phoneNumber)
+            string? phoneNumber,
+            string? address)
         {
             Id = Guid.NewGuid();
             ApplicationUserId = applicationUserId;
             DateOfBirth = dateOfBirth;
             Gender = gender;
             PhoneNumber = phoneNumber;
+            Address = address;
         }
 
         public IReadOnlyCollection<Appointment> GetCompletedAppointments()
@@ -45,10 +44,9 @@ namespace Booking.Domain.Entities
 
         public Appointment GetAppointmentResult(Guid appointmentId)
         {
-            var appointment = Appointments.FirstOrDefault(a => a.Id == appointmentId);
-
-            if (appointment == null)
-                throw new InvalidOperationException("Appointment not found.");
+            var appointment = Appointments
+                .FirstOrDefault(a => a.Id == appointmentId)
+                ?? throw new InvalidOperationException("Appointment not found.");
 
             if (appointment.Status != AppointmentStatus.Completed)
                 throw new InvalidOperationException("Appointment is not completed yet.");

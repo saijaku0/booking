@@ -11,6 +11,7 @@ namespace Booking.API.Controllers
     [Route("api/v1/[controller]")]
     public class PatientController(IMediator mediatR) : ControllerBase
     {
+        private const string RouterProfilte = "profile/{guid:id}";
         private readonly IMediator _mediator = mediatR;
 
         /// <summary>
