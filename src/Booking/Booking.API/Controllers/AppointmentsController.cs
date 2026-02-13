@@ -245,6 +245,7 @@ namespace Booking.API.Controllers
         /// <response code="200">Returns the PDF medical report</response>
         [Authorize]
         [HttpGet("{id:guid}/report")]
+        [Produces("application/pdf")]
         [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetReport(Guid id)
         {
