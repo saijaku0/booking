@@ -39,7 +39,7 @@ public class GetDoctorAppointmentsQueryHandler(
 
         foreach (var app in appointments)
         {
-            var patientName = await _identityService.GetUserNameAsync(app.CustomerId.ToString())
+            var patientName = await _identityService.GetUserNameAsync(app.PatientId.ToString())
                               ?? "Unknown Patient";
 
             resultDtos.Add(new AppointmentDto
@@ -48,7 +48,7 @@ public class GetDoctorAppointmentsQueryHandler(
 
                 DoctorId = app.DoctorId,
 
-                CustomerId = app.CustomerId,
+                PatientId = app.PatientId,
                 PatientName = patientName, 
 
                 StartTime = app.StartTime,

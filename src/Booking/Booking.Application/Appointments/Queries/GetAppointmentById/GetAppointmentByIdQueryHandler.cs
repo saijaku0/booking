@@ -18,7 +18,7 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentById
                 {
                     Id = a.Id,
                     DoctorId = a.DoctorId,
-                    CustomerId = a.CustomerId,
+                    PatientId = a.PatientId,
                     StartTime = a.StartTime,
                     EndTime = a.EndTime
                 })
