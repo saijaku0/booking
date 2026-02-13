@@ -23,14 +23,16 @@ public class BookingDbContext(DbContextOptions<BookingDbContext> options)
             entity.HasKey(p => p.Id);
 
             entity.HasOne(p => p.ApplicationUser)
-                  .WithOne() 
+                  .WithOne(u => u.PatientProfile) 
                   .HasForeignKey<Patient>(p => p.ApplicationUserId)
                   .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasMany(p => p.Appointments)
-                  .WithOne()
-                  .HasForeignKey("PatientId") 
+                  .WithOne(a => a.Patient)
+                  .HasForeignKey(a => a.PatientId) 
                   .OnDelete(DeleteBehavior.Cascade);
+
+            entity.Property(p => p.ApplicationUserId).IsRequired();
         });
 
         modelBuilder.Entity<Doctor>(entity =>
@@ -38,7 +40,7 @@ public class BookingDbContext(DbContextOptions<BookingDbContext> options)
             entity.HasKey(d => d.Id);
 
             entity.HasOne(d => d.ApplicationUser)
-                  .WithOne()
+                  .WithOne(u => u.DoctorProfile)
                   .HasForeignKey<Doctor>(d => d.ApplicationUserId)
                   .OnDelete(DeleteBehavior.Cascade);
 
@@ -46,6 +48,8 @@ public class BookingDbContext(DbContextOptions<BookingDbContext> options)
                   .WithOne(c => c.Doctor)
                   .HasForeignKey<DoctorScheduleConfig>(c => c.DoctorId)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            entity.Property(d => d.ApplicationUserId).IsRequired();
         });
 
         modelBuilder.Entity<Appointment>(builder =>
@@ -60,13 +64,15 @@ public class BookingDbContext(DbContextOptions<BookingDbContext> options)
                    .HasForeignKey("AppointmentId")
                    .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne<Doctor>()
+            builder.HasOne(a => a.Doctor)
                    .WithMany()
-                   .HasForeignKey(a => a.DoctorId);
+                   .HasForeignKey(a => a.DoctorId)
+                   .IsRequired();
 
-            builder.HasOne<Patient>()
+            builder.HasOne(a => a.Patient)
                    .WithMany(p => p.Appointments)
-                   .HasForeignKey("PatientId");
+                   .HasForeignKey(p => p.PatientId)
+                   .IsRequired();
         });
 
         modelBuilder.Entity<DoctorScheduleConfig>(entity =>

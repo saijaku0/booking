@@ -19,7 +19,7 @@ public class Appointment
 {
     public Guid Id { get; private set; }
     public Guid DoctorId { get; private set; }
-    public Guid CustomerId { get; private set; }
+    public Guid PatientId { get; private set; }
     public DateTime StartTime { get; private set; }
     public DateTime EndTime { get; private set; }
     public AppointmentStatus Status { get; private set; }
@@ -38,7 +38,7 @@ public class Appointment
     private Appointment() { }
 
     public Appointment(Guid doctorId, 
-        Guid customerId, 
+        Guid patientId, 
         DateTime start, 
         DateTime end)
     {
@@ -47,7 +47,7 @@ public class Appointment
 
         Id = Guid.NewGuid();
         DoctorId = doctorId;
-        CustomerId = customerId;
+        PatientId = patientId;
         StartTime = start;
         EndTime = end;
         Status = AppointmentStatus.Pending;

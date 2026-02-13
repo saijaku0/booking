@@ -32,7 +32,7 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentReport
                             DoctorName = $"{d.ApplicationUser.FirstName} {d.ApplicationUser.LastName}",
                             DoctorUserId = d.ApplicationUserId, 
                             SpecialtyName = s.Name,
-                            PatientId = a.CustomerId
+                            PatientId = a.PatientId
                         };
 
             var data = await query.FirstOrDefaultAsync(cancellationToken)

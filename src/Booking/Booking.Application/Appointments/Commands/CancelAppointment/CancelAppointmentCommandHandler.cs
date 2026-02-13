@@ -60,7 +60,7 @@ namespace Booking.Application.Appointments.Commands.CancelAppointment
                 if (!Guid.TryParse(currentUserId, out var currentUserGuid))
                     throw new UnauthorizedAccessException("Invalid user id format.");
 
-                if (appointment.CustomerId != currentUserGuid)
+                if (appointment.PatientId != currentUserGuid)
                     throw new UnauthorizedAccessException("You cannot delete someone else's appointment.");
 
                 return;

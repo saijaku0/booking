@@ -172,9 +172,7 @@ namespace Booking.API.Controllers
         /// The appointment must be in 'Confirmed' status.
         /// </remarks>
         /// <param name="id">Appointment ID</param>
-        /// <param name="diagnosis">Doctor medical diagnosis</param>
-        /// <param name="medicalNotes">Doctor medical notes</param>
-        /// <param name="treatmentPlan">Doctor treatment plan</param>
+        /// <param name="command">Data required to complete the appointment, including diagnosis and optional medical notes.</param>
         /// <response code="204">Success</response>
         /// <response code="400">Invalid status (e.g. already canceled)</response>
         /// <response code="403">Not authorized to complete this appointment</response>

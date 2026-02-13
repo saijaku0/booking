@@ -28,14 +28,14 @@ namespace Booking.Application.Appointments.Queries.GetPatientAppointments
                     on appointment.DoctorId equals doctor.Id
                 join specialty in _dbContext.Specialties
                     on doctor.SpecialtyId equals specialty.SpecialtyId
-                where appointment.CustomerId == patientId
+                where appointment.PatientId == patientId
                     orderby appointment.StartTime descending
 
                 select new AppointmentDto
                 {
                     Id = appointment.Id,
                     DoctorId = appointment.DoctorId,
-                    CustomerId = appointment.CustomerId,
+                    PatientId = appointment.PatientId,
                     StartTime = appointment.StartTime,
                     EndTime = appointment.EndTime,
                     Status = appointment.Status.ToString(),

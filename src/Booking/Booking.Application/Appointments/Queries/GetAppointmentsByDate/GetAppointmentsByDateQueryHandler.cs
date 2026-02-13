@@ -43,14 +43,14 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentsByDate
 
             foreach (var app in appointments)
             {
-                var patientName = await _identityService.GetUserNameAsync(app.CustomerId.ToString())
+                var patientName = await _identityService.GetUserNameAsync(app.PatientId.ToString())
                                   ?? "Unknown Patient";
 
                 result.Add(new AppointmentDto
                 {
                     Id = app.Id,
                     DoctorId = app.DoctorId,
-                    CustomerId = app.CustomerId,
+                    PatientId = app.PatientId,
 
                     DoctorName = docName,
                     Specialty = docSpecialty,
