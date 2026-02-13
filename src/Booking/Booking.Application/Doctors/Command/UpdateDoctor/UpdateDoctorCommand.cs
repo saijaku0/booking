@@ -7,6 +7,7 @@ namespace Booking.Application.Doctors.Command.UpdateDoctor
         string Name,
         string Lastname,
         string Specialty,
+        string PhoneNumber,
         string Bio,
         int ExperienceYears,
         string ImageUrl,

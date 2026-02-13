@@ -25,6 +25,7 @@ namespace Booking.Application.Doctors.Command.CreateDoctor
                 Email = createDoctor.Email,
                 FirstName = createDoctor.Name,
                 LastName = createDoctor.Lastname,
+                PhoneNumber = createDoctor.PhoneNumber,
                 EmailConfirmed = true,
             };
 

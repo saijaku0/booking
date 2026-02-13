@@ -25,6 +25,7 @@ namespace Booking.Application.Doctors.Queries.GetDoctorById
                     s.ApplicationUser.FirstName,
                     s.ApplicationUser.LastName,
                     s.SpecialtyId,
+                    s.ApplicationUser.PhoneNumber ?? string.Empty,
                     s.ImageUrl,
                     s.Reviews.Any() ? s.Reviews.Average(r => r.Rating) : 0.0,
                     s.Reviews.Count(),

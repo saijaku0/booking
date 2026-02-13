@@ -47,16 +47,12 @@ public class Doctor
     }
 
     public void UpdateProfile(
-        string name,
-        string lastname,
         string? bio,
         int experienceYears,
         string? imageUrl,
         bool isActive,
         decimal consultationFee)
     {
-        if (string.IsNullOrWhiteSpace(name)) 
-            throw new ArgumentException("Name cannot be empty");
         if (experienceYears < 0) 
             throw new ArgumentException("Experience cannot be negative");
 

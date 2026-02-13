@@ -3,6 +3,7 @@ using Booking.Domain.Constants;
 using Booking.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Booking.Application.Doctors.Command.UpdateDoctor
 {
@@ -21,8 +22,9 @@ namespace Booking.Application.Doctors.Command.UpdateDoctor
             CancellationToken cancellationToken)
         {
             var doctor = await _dbContext.Doctors
-                .FindAsync([request.UserId], cancellationToken) ??
-                throw new KeyNotFoundException("Doctor not found.");
+                .Include(d => d.ApplicationUser)
+                .FirstOrDefaultAsync(d => d.Id == request.UserId, cancellationToken) 
+                ?? throw new KeyNotFoundException("Doctor not found.");
 
             var currentDoctorId = _currentUser.UserId;
 
@@ -37,13 +39,15 @@ namespace Booking.Application.Doctors.Command.UpdateDoctor
                 throw new UnauthorizedAccessException("You can only edit your own profile.");
 
             doctor.UpdateProfile(
-                request.Name,
-                request.Lastname,
                 request.Bio,
                 request.ExperienceYears,
                 request.ImageUrl,
                 request.IsActive,
                 request.ConsultationFee);
+
+            doctor.ApplicationUser.FirstName = request.Name;
+            doctor.ApplicationUser.LastName = request.Lastname;
+            doctor.ApplicationUser.PhoneNumber = request.PhoneNumber;
 
             await _dbContext.SaveChangesAsync(cancellationToken);
 
