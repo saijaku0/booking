@@ -22,56 +22,52 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentReport
 
         public async Task<ExportFileDto> Handle(GetAppointmentReportQuery request, CancellationToken cancellationToken)
         {
-            var query = from a in _dbContext.Appointments
-                        join d in _dbContext.Doctors on a.DoctorId equals d.Id 
-                        join s in _dbContext.Specialties on d.SpecialtyId equals s.SpecialtyId
-                        where a.Id == request.AppointmentId
-                        select new
-                        {
-                            Appointment = a,
-                            DoctorName = $"{d.ApplicationUser.FirstName} {d.ApplicationUser.LastName}",
-                            DoctorUserId = d.ApplicationUserId, 
-                            SpecialtyName = s.Name,
-                            PatientId = a.PatientId
-                        };
-
-            var data = await query.FirstOrDefaultAsync(cancellationToken)
+            var appointment = await _dbContext.Appointments
+                .AsNoTracking()
+                .Include(a => a.Doctor)
+                    .ThenInclude(d => d.ApplicationUser) 
+                .Include(a => a.Doctor)
+                    .ThenInclude(d => d.Specialty)      
+                .Include(a => a.Patient)
+                    .ThenInclude(p => p.ApplicationUser) 
+                .FirstOrDefaultAsync(a => a.Id == request.AppointmentId, cancellationToken)
                 ?? throw new NotFoundException("Appointment", request.AppointmentId);
 
             var currentUserId = _currentUserService.UserId;
             if (string.IsNullOrEmpty(currentUserId)) throw new UnauthorizedAccessException();
 
             var isAdmin = await _identityService.IsInRoleAsync(currentUserId, Roles.Admin);
-            var isDoctor = await _identityService.IsInRoleAsync(currentUserId, Roles.Doctor);
 
             if (!isAdmin)
             {
-                if (isDoctor)
+                bool isMyDoctor = appointment.Doctor.ApplicationUserId == currentUserId;
+                bool isMyPatient = appointment.Patient.ApplicationUserId == currentUserId; 
+
+                if (!isMyDoctor && !isMyPatient)
                 {
-                    if (data.DoctorUserId != currentUserId)
-                        throw new UnauthorizedAccessException("Doctors can only access reports for their own appointments.");
-                }
-                else
-                {
-                    if (data.PatientId.ToString() != currentUserId)
-                        throw new UnauthorizedAccessException("You can only access your own medical reports.");
+                    throw new UnauthorizedAccessException("Access denied: You are not related to this appointment.");
                 }
             }
 
-            var patientName = await _identityService.GetUserNameAsync(data.PatientId.ToString()) ?? "Unknown";
+            var docUser = appointment.Doctor.ApplicationUser;
+            var patUser = appointment.Patient.ApplicationUser;
+
+            var doctorName = docUser != null ? $"{docUser.FirstName} {docUser.LastName}" : "Unknown Doctor";
+            var patientName = patUser != null ? $"{patUser.FirstName} {patUser.LastName}" : "Unknown Patient";
+            var specialty = appointment.Doctor.Specialty?.Name ?? "General Practice";
 
             var reportData = new MedicalReportDto(
-                DoctorName: data.DoctorName,      
-                DoctorSpecialty: data.SpecialtyName, 
+                DoctorName: doctorName,
+                DoctorSpecialty: specialty,
                 PatientName: patientName,
-                Date: data.Appointment.StartTime,
-                Diagnosis: data.Appointment.MedicalNotes ?? "No notes.",
-                MedicalNotes: data.Appointment.MedicalNotes ?? string.Empty,
-                TreatmentPlan: "Standard recovery procedures."
+                Date: appointment.StartTime,
+                Diagnosis: appointment.Diagnosis ?? "Pending Diagnosis", 
+                MedicalNotes: appointment.MedicalNotes ?? string.Empty,
+                TreatmentPlan: appointment.TreatmentPlan ?? "No treatment plan specified."
             );
 
             var fileContent = _pdfGenerator.GenerateMedicalReport(reportData);
-            var fileName = $"MedicalReport_{data.Appointment.StartTime:yyyyMMdd}_{data.Appointment.Id}.pdf";
+            var fileName = $"MedicalReport_{appointment.StartTime:yyyyMMdd}_{appointment.Id}.pdf";
 
             return new ExportFileDto(fileName, "application/pdf", fileContent);
         }
