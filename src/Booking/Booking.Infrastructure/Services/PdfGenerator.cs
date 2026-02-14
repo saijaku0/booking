@@ -35,7 +35,13 @@ namespace Booking.Infrastructure.Services
                         if (!string.IsNullOrWhiteSpace(data.TreatmentPlan))
                         {
                             col.Item().PaddingTop(10);
-                            col.Item().Element(c => ComposeSection(c, "Treatment Plan & Prescriptions", data.TreatmentPlan));
+                            col.Item().Element(c => ComposeSection(c, "Treatment Plan", data.TreatmentPlan));
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(data.PrescribedMedications))
+                        {
+                            col.Item().PaddingTop(10);
+                            col.Item().Element(c => ComposeSection(c, "Prescribed Medications", data.PrescribedMedications));
                         }
 
                         if (!string.IsNullOrWhiteSpace(data.MedicalNotes))
@@ -73,7 +79,8 @@ namespace Booking.Infrastructure.Services
                            .Border(1)
                            .BorderColor(Colors.Grey.Lighten2)
                            .Padding(15)
-                           .Text(data.TreatmentPlan ?? "No medications prescribed.")
+                           .MinHeight(100)
+                           .Text(data.PrescribedMedications ?? "No medications prescribed.")
                            .FontSize(14); 
 
                         col.Item().PaddingTop(50).Row(row =>

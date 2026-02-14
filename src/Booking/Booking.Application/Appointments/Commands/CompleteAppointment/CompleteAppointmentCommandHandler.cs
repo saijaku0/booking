@@ -28,6 +28,7 @@ namespace Booking.Application.Appointments.Commands.CompleteAppointment
             CancellationToken cancellationToken)
         {
             var appointment = await _dbContext.Appointments
+                .Include(a => a.Attachments)
                 .Include(a => a.Patient).ThenInclude(p => p.ApplicationUser)
                 .Include(a => a.Doctor).ThenInclude(d => d.Specialty)
                 .Include(a => a.Doctor).ThenInclude(d => d.ApplicationUser)
@@ -39,14 +40,11 @@ namespace Booking.Application.Appointments.Commands.CompleteAppointment
 
             if (!isAdmin)
             {
-                if (appointment.Doctor.ApplicationUser?.Id != userId)
+                if (appointment.Doctor.ApplicationUserId != userId)
                     throw new UnauthorizedAccessException("You can only complete your own appointments.");
             }
 
-            appointment.Complete(request.Diagnosis, request.MedicalNotes, request.TreatmentPlan);
-
-            if (appointment == null)
-                throw new NotFoundException(nameof(Appointment), request.AppointmentId);
+            appointment.Complete(request.Diagnosis, request.MedicalNotes, request.TreatmentPlan, request.PrescribedMedications);
 
             var reportDto = new MedicalReportDto(
                 DoctorName: $"{appointment.Doctor.ApplicationUser.FirstName} {appointment.Doctor.ApplicationUser.LastName}",
@@ -55,8 +53,9 @@ namespace Booking.Application.Appointments.Commands.CompleteAppointment
                 Date: DateTime.Now,
 
                 Diagnosis: appointment.Diagnosis!,
-                MedicalNotes: appointment.MedicalNotes,
-                TreatmentPlan: appointment.TreatmentPlan
+                MedicalNotes: appointment.MedicalNotes ?? "",
+                TreatmentPlan: appointment.TreatmentPlan ?? "",
+                PrescribedMedications: appointment.PrescribedMedications ?? ""
             );
 
             var reportBytes = _pdfService.GenerateMedicalReport(reportDto);
@@ -66,14 +65,16 @@ namespace Booking.Application.Appointments.Commands.CompleteAppointment
                 $"Report_{appointment.Id}.pdf",
                 "application/pdf");
 
-            appointment.AddAttachment(
+            var reportAttachment = appointment.AddAttachment(
                 fileName: "Medical_Report.pdf",
                 filePath: reportPath,
                 fileType: "application/pdf",
                 type: AttachmentType.MedicalReport
             );
 
-            if (!string.IsNullOrWhiteSpace(request.TreatmentPlan))
+            _dbContext.AppointmentAttachments.Add(reportAttachment);
+
+            if (!string.IsNullOrWhiteSpace(request.PrescribedMedications))
             {
                 var prescriptionBytes = _pdfService.GeneratePrescription(reportDto);
 
@@ -82,12 +83,14 @@ namespace Booking.Application.Appointments.Commands.CompleteAppointment
                     $"Prescription_{appointment.Id}.pdf",
                     "application/pdf");
 
-                appointment.AddAttachment(
+                var prescriptionAttachment = appointment.AddAttachment(
                     fileName: "Prescription.pdf",
                     filePath: prescriptionPath,
                     fileType: "application/pdf",
                     type: AttachmentType.Prescription
                 );
+
+                _dbContext.AppointmentAttachments.Add(prescriptionAttachment);
             }
 
             await _dbContext.SaveChangesAsync(cancellationToken);

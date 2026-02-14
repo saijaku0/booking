@@ -3,8 +3,9 @@ using Booking.Application.Common.Interfaces;
 using Booking.Application.Specialties.Dtos;
 using Booking.Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
-namespace Booking.Application.Specialties.Queries
+namespace Booking.Application.Specialties.Queries.GetSpecialtiesById
 {
     public class GetSpecialtyByIdQueryHandler(IBookingDbContext context)
     : IRequestHandler<GetSpecialtyByIdQuery, SpecialtyDto>
@@ -16,12 +17,9 @@ namespace Booking.Application.Specialties.Queries
             CancellationToken cancellationToken)
         {
             var entity = await _context.Specialties
-                .FindAsync([request.Id], cancellationToken);
-
-            if (entity == null)
-            {
-                throw new NotFoundException(nameof(Specialty), request.Id);
-            }
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.SpecialtyId == request.Id, cancellationToken)
+                ?? throw new NotFoundException(nameof(Specialty), request.Id);
 
             return new SpecialtyDto
             {

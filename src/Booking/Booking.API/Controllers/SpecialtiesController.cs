@@ -1,6 +1,9 @@
 ﻿using Booking.Application.Specialties.Command.CreateSpecialty;
+using Booking.Application.Specialties.Command.RemoveSpecialty;
+using Booking.Application.Specialties.Command.UpdateSpecialty;
 using Booking.Application.Specialties.Dtos;
-using Booking.Application.Specialties.Queries;
+using Booking.Application.Specialties.Queries.GetListSpecialties;
+using Booking.Application.Specialties.Queries.GetSpecialtiesById;
 using Booking.Domain.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -69,6 +72,51 @@ namespace Booking.API.Controllers
         public async Task<ActionResult<SpecialtyDto>> GetById(Guid id)
         {
             return await _mediator.Send(new GetSpecialtyByIdQuery(id));
+        }
+
+        /// <summary>
+        /// Updates an existing medical specialty.
+        /// </summary>
+        /// <remarks>
+        /// **Requires Admin role.**
+        /// </remarks>
+        /// <param name="id">Unique identifier of the specialty</param>
+        /// <param name="command">The command containing the updated specialty details</param>
+        /// <returns>No content if successful</returns>
+        /// <response code="204">Specialty updated successfully</response>
+        /// <response code="400">If the ID in the URL does not match the ID in the command, or if the specialty name is empty or already exists.</response>
+        [Authorize(Roles = Roles.Admin)] 
+        [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Update(Guid id, UpdateSpecialtyCommand command)
+        {
+            if (id != command.Id) return BadRequest();
+
+            await _mediator.Send(command);
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Deletes a medical specialty by
+        /// </summary>
+        /// <remarks>
+        /// **Requires Admin role.**
+        /// </remarks>
+        /// <param name="id">Unique identifier of the specialty</param>
+        /// <returns>No content if successful</returns>
+        /// <response code="204">Specialty deleted successfully</response>
+        /// <response code="400">If the ID is invalid.</response>
+        /// <response code="404">If the specialty with the specified ID does not exist.</response>
+        [Authorize(Roles = Roles.Admin)] 
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)] 
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await _mediator.Send(new RemoveSpecialtyCommand(id));
+            return NoContent();
         }
     }
 }

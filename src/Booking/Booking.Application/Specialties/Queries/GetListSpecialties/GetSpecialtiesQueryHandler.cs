@@ -3,7 +3,7 @@ using Booking.Application.Specialties.Dtos;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Booking.Application.Specialties.Queries
+namespace Booking.Application.Specialties.Queries.GetListSpecialties
 {
     public class GetSpecialtiesQueryHandler(IBookingDbContext dbContext) 
         : IRequestHandler<GetSpecialtiesQuery, List<SpecialtyDto>>
