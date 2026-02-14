@@ -6,6 +6,7 @@ namespace Booking.Application.Appointments.Commands.CompleteAppointment
         Guid AppointmentId,
         string Diagnosis,
         string? MedicalNotes,
-        string? TreatmentPlan
+        string? TreatmentPlan,
+        string? PrescribedMedications
         ) : IRequest;
 }

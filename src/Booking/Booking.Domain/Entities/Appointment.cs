@@ -31,6 +31,7 @@ public class Appointment
     public string? MedicalNotes { get; private set; }
     public string? Diagnosis { get; private set; }
     public string? TreatmentPlan { get; private set; }
+    public string? PrescribedMedications { get; private set; }
 
     public IReadOnlyCollection<AppointmentAttachment> Attachments => _attachments.AsReadOnly();
     private readonly List<AppointmentAttachment> _attachments = new();
@@ -54,12 +55,13 @@ public class Appointment
         CreatedAt = DateTime.UtcNow;
     }
 
-    public void AddAttachment(string fileName, string filePath, string fileType, AttachmentType type)
+    public AppointmentAttachment AddAttachment(string fileName, string filePath, string fileType, AttachmentType type)
     {
         if (Status == AppointmentStatus.Canceled)
             throw new InvalidOperationException("Cannot add attachments to a canceled appointment.");
         var attachment = new AppointmentAttachment(Id, fileName, filePath, fileType, type);
         _attachments.Add(attachment);
+        return attachment;
     }
 
     public void Confirm()
@@ -74,7 +76,7 @@ public class Appointment
         Status = AppointmentStatus.Canceled;
     }
 
-    public void Complete(string diagnosis, string? medicalNotes, string? treatmentPlan)
+    public void Complete(string diagnosis, string? medicalNotes, string? treatmentPlan, string? medications)
     {
         if (Status != AppointmentStatus.Confirmed)
             throw new InvalidOperationException("Only confirmed appointments can be completed.");
@@ -84,6 +86,7 @@ public class Appointment
         MedicalNotes = medicalNotes;
         Diagnosis = diagnosis;
         TreatmentPlan = treatmentPlan;
+        PrescribedMedications = medications;
         Status = AppointmentStatus.Completed;
     }
 

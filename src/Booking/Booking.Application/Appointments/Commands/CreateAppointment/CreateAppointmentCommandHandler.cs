@@ -1,4 +1,5 @@
-﻿using Booking.Application.Common.Extension;
+﻿using Booking.Application.Common.Exceptions;
+using Booking.Application.Common.Extension;
 using Booking.Application.Common.Interfaces;
 using Booking.Domain.Entities;
 using FluentValidation;
@@ -28,14 +29,22 @@ namespace Booking.Application.Appointments.Commands.CreateAppointment
                 throw new ValidationException([failure]);
             }
 
-            var userId = Guid.Parse(_currentUserService.UserId);
+            //var userId = Guid.Parse(_currentUserService.UserId);
 
-            if (userId == Guid.Empty)
-                throw new UnauthorizedAccessException("User ID is invalid or missing.");
+            //if (userId == Guid.Empty)
+            //    throw new UnauthorizedAccessException("User ID is invalid or missing.");
+
+            var userId = _currentUserService.UserId;
+
+            var patient = await _context.Patients
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.ApplicationUserId == userId, cancellationToken)
+                ?? throw new ValidationException(new[] { new FluentValidation.Results.ValidationFailure("Patient", $"Patient profile not found for user {userId}. Please complete your profile registration.") });
+            
 
             Appointment appointment = new(
                 request.DoctorId,
-                userId,
+                patient.Id,
                 request.StartTime,
                 request.EndTime
             );

@@ -63,7 +63,8 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentReport
                 Date: appointment.StartTime,
                 Diagnosis: appointment.Diagnosis ?? "Pending Diagnosis", 
                 MedicalNotes: appointment.MedicalNotes ?? string.Empty,
-                TreatmentPlan: appointment.TreatmentPlan ?? "No treatment plan specified."
+                TreatmentPlan: appointment.TreatmentPlan ?? "No treatment plan specified.",
+                PrescribedMedications: appointment.PrescribedMedications ?? "No medications prescribed."
             );
 
             var fileContent = _pdfGenerator.GenerateMedicalReport(reportData);

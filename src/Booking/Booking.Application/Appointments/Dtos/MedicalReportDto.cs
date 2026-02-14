@@ -7,5 +7,6 @@
         DateTime Date,
         string Diagnosis,
         string? MedicalNotes,
-        string? TreatmentPlan);
+        string? TreatmentPlan,
+        string? PrescribedMedications);
 }

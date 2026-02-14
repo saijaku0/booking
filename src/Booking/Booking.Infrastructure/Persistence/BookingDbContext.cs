@@ -59,11 +59,6 @@ public class BookingDbContext(DbContextOptions<BookingDbContext> options)
             builder.Property(a => a.Status)
                    .HasConversion<string>();
 
-            builder.HasMany(a => a.Attachments)
-                   .WithOne()
-                   .HasForeignKey("AppointmentId")
-                   .OnDelete(DeleteBehavior.Cascade);
-
             builder.HasOne(a => a.Doctor)
                    .WithMany()
                    .HasForeignKey(a => a.DoctorId)
@@ -97,6 +92,15 @@ public class BookingDbContext(DbContextOptions<BookingDbContext> options)
                   .WithMany(p => p.Reviews) 
                   .HasForeignKey(r => r.PatientId)
                   .OnDelete(DeleteBehavior.Restrict); 
+        });
+
+        modelBuilder.Entity<AppointmentAttachment>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne<Appointment>()
+                  .WithMany(a => a.Attachments)
+                  .HasForeignKey(e => e.AppointmentId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         base.OnModelCreating(modelBuilder);
