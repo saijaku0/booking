@@ -9,12 +9,12 @@ namespace Booking.Application.Appointments.Queries.GetPatientAppointments
     public class GetPatientAppointmentsQueryHandler(
         IBookingDbContext dbContext,
         ICurrentUserService userService)
-        : IRequestHandler<GetPatientAppointmentsQuery, List<AppointmentDto>>
+        : IRequestHandler<GetPatientAppointmentsQuery, List<AppointmentListDto>>
     {
         private readonly IBookingDbContext _dbContext = dbContext;
         private readonly ICurrentUserService _userService = userService;
 
-        public async Task<List<AppointmentDto>> Handle(
+        public async Task<List<AppointmentListDto>> Handle(
             GetPatientAppointmentsQuery request,
             CancellationToken cancellationToken)
         {
@@ -31,7 +31,7 @@ namespace Booking.Application.Appointments.Queries.GetPatientAppointments
                 where appointment.PatientId == patientId
                     orderby appointment.StartTime descending
 
-                select new AppointmentDto
+                select new AppointmentListDto
                 {
                     Id = appointment.Id,
                     DoctorId = appointment.DoctorId,

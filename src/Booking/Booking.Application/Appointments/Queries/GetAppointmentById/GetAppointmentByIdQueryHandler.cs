@@ -8,41 +8,49 @@ using Microsoft.EntityFrameworkCore;
 namespace Booking.Application.Appointments.Queries.GetAppointmentById
 {
     public class GetAppointmentByIdQueryHandler(IBookingDbContext context) 
-        : IRequestHandler<GetAppointmentByIdQuery, AppointmentDto>
+        : IRequestHandler<GetAppointmentByIdQuery, AppointmentDetailDto>
     {
         private readonly IBookingDbContext _context = context;
 
-        public async Task<AppointmentDto> Handle(GetAppointmentByIdQuery request, CancellationToken cancellationToken)
+        public async Task<AppointmentDetailDto> Handle(
+            GetAppointmentByIdQuery request, 
+            CancellationToken cancellationToken)
         {
             var appointment = await _context.Appointments
                 .AsNoTracking()
-                .Where(x => x.Id == request.Id)
-                .Select(a => new AppointmentDto
+                .Include(a => a.Doctor)
+                .Include(a => a.Attachments)
+                .FirstOrDefaultAsync(a => a.Id == request.Id, cancellationToken)
+                ?? throw new NotFoundException(nameof(Appointment), request.Id);
+
+            return new AppointmentDetailDto
+            {
+                Id = appointment.Id,
+                DoctorId = appointment.DoctorId,
+                PatientId = appointment.PatientId,
+
+                StartTime = appointment.StartTime,
+                EndTime = appointment.EndTime,
+
+                Status = appointment.Status.ToString(),
+                MedicalNotes = appointment.MedicalNotes,
+
+                DoctorName = $"{appointment.Doctor.ApplicationUser.FirstName} {appointment.Doctor.ApplicationUser.LastName}",
+                DoctorPhotoUrl = appointment.Doctor.ApplicationUser.PhotoUrl,
+                DoctorPhoneNumber = appointment.Doctor.ApplicationUser.PhoneNumber,
+                Price = appointment.Doctor.ConsultationFee,
+                Specialty = appointment.Doctor.Specialty.Name,
+
+                Attachments = [.. appointment.Attachments.Select(att => new AttachmentDto
                 {
-                    Id = a.Id,
-                    DoctorId = a.DoctorId,
-                    PatientId = a.PatientId,
+                    Id = att.Id,
+                    FileName = att.FileName,
+                    FileType = att.FileType,
+                    CreatedAt = att.DateCreated
+                })],
 
-                    StartTime = a.StartTime,
-                    EndTime = a.EndTime,
-
-                    Status = a.Status.ToString(),
-                    MedicalNotes = a.MedicalNotes,
-
-                    DoctorName = $"{a.Doctor.ApplicationUser.FirstName} {a.Doctor.ApplicationUser.LastName}",
-                    DoctorPhotoUrl = a.Doctor.ApplicationUser.PhotoUrl,
-                    DoctorPhoneNumber = a.Doctor.ApplicationUser.PhoneNumber,
-                    Price = a.Doctor.ConsultationFee,
-                    Specialty = a.Doctor.Specialty.Name,
-
-                    PatientName = $"{a.Patient.ApplicationUser.FirstName} {a.Patient.ApplicationUser.LastName}"
-                })
-                .FirstOrDefaultAsync(cancellationToken);
-
-                if (appointment == null)
-                    throw new NotFoundException(nameof(appointment), request.Id);
-
-            return appointment;
+                PatientName = $"{appointment.Patient.ApplicationUser.FirstName} {appointment.Patient.ApplicationUser.LastName}"
+            };
         }
     }
 }

@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Booking.Application.Appointments.Queries.GetAppointmentsByDate
 {
-    public record GetAppointmentsByDateQuery : IRequest<List<AppointmentDto>>
+    public record GetAppointmentsByDateQuery : IRequest<List<AppointmentListDto>>
     {
         public Guid DoctorId { get; init; }
         public DateTime StartTime { get; init; }
