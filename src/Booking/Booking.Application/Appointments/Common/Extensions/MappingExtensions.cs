@@ -5,7 +5,8 @@ namespace Booking.Application.Appointments.Common.Extensions
 {
     public static class MappingExtensions
     {
-        public static List<AttachmentDto> ToAttachmentDtos(this IEnumerable<AppointmentAttachment> attachments)
+        public static List<AttachmentDto> ToAttachmentDtos(
+            this IEnumerable<AppointmentAttachment> attachments)
         {
             if (attachments == null)
                 return [];
