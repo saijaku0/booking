@@ -1,4 +1,4 @@
-﻿namespace Booking.Domain.Entities
+namespace Booking.Domain.Entities
 {
     public class AppointmentAttachment
     {
@@ -18,6 +18,15 @@
 
         private AppointmentAttachment() { }
 
+        /// <summary>
+        /// Initializes a new AppointmentAttachment for the specified appointment and file, generating a new Id and recording creation time.
+        /// </summary>
+        /// <param name="appointmentId">Identifier of the appointment this attachment belongs to.</param>
+        /// <param name="fileName">The file's name; cannot be null, empty, or whitespace.</param>
+        /// <param name="filePath">The file's storage path; cannot be null, empty, or whitespace.</param>
+        /// <param name="fileType">The file's MIME type; must be one of "image/jpeg", "image/png", or "application/pdf".</param>
+        /// <param name="type">The attachment's domain-specific type.</param>
+        /// <exception cref="ArgumentException">Thrown if fileName, filePath, or fileType is null, empty, whitespace, or if fileType is not an allowed type.</exception>
         public AppointmentAttachment(
             Guid appointmentId,
             string fileName,

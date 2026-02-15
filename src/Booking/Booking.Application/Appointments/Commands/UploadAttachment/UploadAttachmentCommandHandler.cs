@@ -1,4 +1,4 @@
-﻿using Booking.Application.Common.Exceptions;
+using Booking.Application.Common.Exceptions;
 using Booking.Application.Common.Interfaces;
 using Booking.Domain.Entities;
 using MediatR;
@@ -15,6 +15,13 @@ namespace Booking.Application.Appointments.Commands.UploadAttachment
         private readonly IFileStorageService _fileStorageService = fileStorageService;
         private readonly ICurrentUserService _userService = userService;
 
+        /// <summary>
+        /// Uploads a file as an attachment to the specified appointment and returns the new attachment's identifier.
+        /// </summary>
+        /// <param name="request">Command containing the target appointment ID, the uploaded file, and the attachment file type.</param>
+        /// <returns>The identifier of the created attachment.</returns>
+        /// <exception cref="NotFoundException">Thrown when no appointment exists with the specified ID.</exception>
+        /// <exception cref="UnauthorizedAccessException">Thrown when the current user is not authenticated or is not the appointment's patient or doctor.</exception>
         public async Task<Guid> Handle(
             UploadAttachmentCommand request, 
             CancellationToken cancellationToken)
