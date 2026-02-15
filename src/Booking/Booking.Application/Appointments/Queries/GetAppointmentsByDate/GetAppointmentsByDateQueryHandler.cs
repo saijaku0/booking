@@ -10,12 +10,14 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentsByDate
     public class GetAppointmentsByDateQueryHandler(
         IBookingDbContext context,
         IIdentityService identityService) 
-        : IRequestHandler<GetAppointmentsByDateQuery, List<AppointmentDto>>
+        : IRequestHandler<GetAppointmentsByDateQuery, List<AppointmentListDto>>
     {
         private readonly IBookingDbContext _context = context;
         private readonly IIdentityService _identityService = identityService;
 
-        public async Task<List<AppointmentDto>> Handle(GetAppointmentsByDateQuery request, CancellationToken cancellationToken)
+        public async Task<List<AppointmentListDto>> Handle(
+            GetAppointmentsByDateQuery request, 
+            CancellationToken cancellationToken)
         {
             var doctorInfo = await _context.Doctors
             .Include(d => d.Specialty) 
@@ -39,14 +41,14 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentsByDate
                     request.EndTime) 
                 .ToListAsync(cancellationToken);
 
-            var result = new List<AppointmentDto>();
+            var result = new List<AppointmentListDto>();
 
             foreach (var app in appointments)
             {
                 var patientName = await _identityService.GetUserNameAsync(app.PatientId.ToString())
                                   ?? "Unknown Patient";
 
-                result.Add(new AppointmentDto
+                result.Add(new AppointmentListDto
                 {
                     Id = app.Id,
                     DoctorId = app.DoctorId,

@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Booking.Application.Appointments.Queries.GetAppointmentById
 {
-    public record GetAppointmentByIdQuery : IRequest<AppointmentDto>
+    public record GetAppointmentByIdQuery : IRequest<AppointmentDetailDto>
     {
         public Guid Id { get; init; }
     }

@@ -61,7 +61,7 @@ namespace Booking.API.Controllers
         /// <response code="200">Successful request. Returns a reservation</response>
         /// <response code="404">Invalid ID. Return a errore code</response>
         [HttpGet("{id:guid}")]
-        [ProducesResponseType(typeof(AppointmentDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AppointmentDetailDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -83,8 +83,8 @@ namespace Booking.API.Controllers
         /// <response code="200">Successful request. Returns a list (may be empty)</response>
         [HttpGet]
         [Authorize(Roles = Roles.Admin + "," + Roles.Doctor)]
-        [ProducesResponseType(typeof(List<AppointmentDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<AppointmentDto>>> GetAppointmentsByDateQuery(
+        [ProducesResponseType(typeof(List<AppointmentDetailDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<AppointmentDetailDto>>> GetAppointmentsByDateQuery(
             [FromQuery] Guid doctorId,
             [FromQuery] DateTime start,
             [FromQuery] DateTime end)
@@ -115,8 +115,8 @@ namespace Booking.API.Controllers
         /// <response code="403">User is authorized but does not have the 'doctor' role.</response>
         [HttpGet("doctor-schedule")]
         [Authorize(Roles = Roles.Doctor)]
-        [ProducesResponseType(typeof(List<AppointmentDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<AppointmentDto>>> GetDoctorAppointmentsQuery(
+        [ProducesResponseType(typeof(List<AppointmentDetailDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<AppointmentDetailDto>>> GetDoctorAppointmentsQuery(
             [FromQuery] DateTime? start,
             [FromQuery] DateTime? end)
         {
@@ -231,10 +231,10 @@ namespace Booking.API.Controllers
         /// <response code="403">User is authorized but is not a Patient (e.g. a Doctor trying to view patient records)</response>
         [HttpGet("patient-history")]
         [Authorize(Roles = Roles.Patient)]
-        [ProducesResponseType(typeof(List<AppointmentDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<AppointmentListDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult<List<AppointmentDto>>> GetPatientAppointments()
+        public async Task<ActionResult<List<AppointmentListDto>>> GetPatientAppointments()
         {
             return await _mediator.Send(new GetPatientAppointmentsQuery());
         }

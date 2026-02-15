@@ -1,6 +1,7 @@
-﻿namespace Booking.Application.Appointments.Dtos
+﻿
+namespace Booking.Application.Appointments.Dtos
 {
-    public record AppointmentDto
+    public record AppointmentDetailDto
     {
         public Guid Id { get; init; }
         public Guid DoctorId { get; init; }
@@ -16,6 +17,7 @@
 
         public string Status { get; init; } = string.Empty;
         public string? MedicalNotes {  get; init; } = string.Empty;
+        public List<AttachmentDto> Attachments { get; init; } = [];
         public DateTime StartTime { get; init; }
         public DateTime EndTime { get; init; }
     }

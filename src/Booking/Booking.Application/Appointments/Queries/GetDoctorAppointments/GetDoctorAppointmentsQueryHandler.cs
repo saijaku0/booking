@@ -1,21 +1,20 @@
-﻿using Booking.Application.Appointments.Dtos;
+﻿using Booking.Application.Appointments.Common.Extensions;
+using Booking.Application.Appointments.Dtos;
 using Booking.Application.Common.Interfaces;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
+using MediatR;
 
 namespace Booking.Application.Appointments.Queries.GetDoctorAppointments;
 
 public class GetDoctorAppointmentsQueryHandler(
     IBookingDbContext bookingDbContext,
-    ICurrentUserService currentUserService,
-    IIdentityService identityService) 
-    : IRequestHandler<GetDoctorAppointmentsQuery, List<AppointmentDto>>
+    ICurrentUserService currentUserService) 
+    : IRequestHandler<GetDoctorAppointmentsQuery, List<AppointmentDetailDto>>
 {
     private readonly IBookingDbContext _context = bookingDbContext;
     private readonly ICurrentUserService _currentUserService = currentUserService;
-    private readonly IIdentityService _identityService = identityService;
 
-    public async Task<List<AppointmentDto>> Handle(
+    public async Task<List<AppointmentDetailDto>> Handle(
         GetDoctorAppointmentsQuery request,
         CancellationToken cancellationToken)
     {
@@ -23,6 +22,9 @@ public class GetDoctorAppointmentsQueryHandler(
 
         var query = _context.Appointments
             .AsNoTracking()
+            .Include(a => a.Attachments)
+            .Include(a => a.Patient)
+                .ThenInclude(p => p.ApplicationUser)
             .Where(a => a.DoctorId == doctorId);
 
         if (request.Start.HasValue)
@@ -35,26 +37,29 @@ public class GetDoctorAppointmentsQueryHandler(
             .OrderBy(a => a.StartTime)
             .ToListAsync(cancellationToken);
 
-        var resultDtos = new List<AppointmentDto>();
+        var resultDtos = new List<AppointmentDetailDto>();
 
         foreach (var app in appointments)
         {
-            var patientName = await _identityService.GetUserNameAsync(app.PatientId.ToString())
-                              ?? "Unknown Patient";
+            var firstName = app.Patient?.ApplicationUser?.FirstName ?? "Unknown";
+            var lastName = app.Patient?.ApplicationUser?.LastName ?? "Patient";
+            var patientName = $"{firstName} {lastName}";
 
-            resultDtos.Add(new AppointmentDto
+            resultDtos.Add(new AppointmentDetailDto
             {
                 Id = app.Id,
 
                 DoctorId = app.DoctorId,
 
                 PatientId = app.PatientId,
-                PatientName = patientName, 
+                PatientName = patientName,
 
                 StartTime = app.StartTime,
                 EndTime = app.EndTime,
                 Status = app.Status.ToString(),
-                MedicalNotes = app.MedicalNotes ?? string.Empty
+                MedicalNotes = app.MedicalNotes ?? string.Empty,
+
+                Attachments = app.Attachments.ToAttachmentDtos(),
             });
         }
 

@@ -1,4 +1,5 @@
-﻿using Booking.Application.Appointments.Dtos;
+﻿using Booking.Application.Appointments.Common.Extensions;
+using Booking.Application.Appointments.Dtos;
 using Booking.Application.Common.Exceptions;
 using Booking.Application.Common.Interfaces;
 using Booking.Domain.Entities;
@@ -8,41 +9,46 @@ using Microsoft.EntityFrameworkCore;
 namespace Booking.Application.Appointments.Queries.GetAppointmentById
 {
     public class GetAppointmentByIdQueryHandler(IBookingDbContext context) 
-        : IRequestHandler<GetAppointmentByIdQuery, AppointmentDto>
+        : IRequestHandler<GetAppointmentByIdQuery, AppointmentDetailDto>
     {
         private readonly IBookingDbContext _context = context;
 
-        public async Task<AppointmentDto> Handle(GetAppointmentByIdQuery request, CancellationToken cancellationToken)
+        public async Task<AppointmentDetailDto> Handle(
+            GetAppointmentByIdQuery request, 
+            CancellationToken cancellationToken)
         {
             var appointment = await _context.Appointments
                 .AsNoTracking()
-                .Where(x => x.Id == request.Id)
-                .Select(a => new AppointmentDto
-                {
-                    Id = a.Id,
-                    DoctorId = a.DoctorId,
-                    PatientId = a.PatientId,
+                .Include(a => a.Doctor)
+                .Include(a => a.Attachments)
+                .FirstOrDefaultAsync(a => a.Id == request.Id, cancellationToken)
+                ?? throw new NotFoundException(nameof(Appointment), request.Id);
 
-                    StartTime = a.StartTime,
-                    EndTime = a.EndTime,
+            var DoctorName = $"{appointment.Doctor.ApplicationUser.FirstName} {appointment.Doctor.ApplicationUser.LastName}";
+            var PatientName = $"{appointment.Patient.ApplicationUser.FirstName} {appointment.Patient.ApplicationUser.LastName}";
 
-                    Status = a.Status.ToString(),
-                    MedicalNotes = a.MedicalNotes,
+            return new AppointmentDetailDto
+            {
+                Id = appointment.Id,
+                DoctorId = appointment.DoctorId,
+                PatientId = appointment.PatientId,
 
-                    DoctorName = $"{a.Doctor.ApplicationUser.FirstName} {a.Doctor.ApplicationUser.LastName}",
-                    DoctorPhotoUrl = a.Doctor.ApplicationUser.PhotoUrl,
-                    DoctorPhoneNumber = a.Doctor.ApplicationUser.PhoneNumber,
-                    Price = a.Doctor.ConsultationFee,
-                    Specialty = a.Doctor.Specialty.Name,
+                StartTime = appointment.StartTime,
+                EndTime = appointment.EndTime,
 
-                    PatientName = $"{a.Patient.ApplicationUser.FirstName} {a.Patient.ApplicationUser.LastName}"
-                })
-                .FirstOrDefaultAsync(cancellationToken);
+                Status = appointment.Status.ToString(),
+                MedicalNotes = appointment.MedicalNotes,
 
-                if (appointment == null)
-                    throw new NotFoundException(nameof(appointment), request.Id);
+                DoctorName = DoctorName,
+                DoctorPhotoUrl = appointment.Doctor.ApplicationUser.PhotoUrl,
+                DoctorPhoneNumber = appointment.Doctor.ApplicationUser.PhoneNumber,
+                Price = appointment.Doctor.ConsultationFee,
+                Specialty = appointment.Doctor.Specialty.Name,
 
-            return appointment;
+                Attachments = appointment.Attachments.ToAttachmentDtos(),
+
+                PatientName = PatientName
+            };
         }
     }
 }
