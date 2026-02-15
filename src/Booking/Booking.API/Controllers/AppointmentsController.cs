@@ -288,19 +288,6 @@ namespace Booking.API.Controllers
         }
 
         /// <summary>
-        /// Uploads an attachment (e.g. medical report, prescription) to a specific appointment.
-        /// </summary>
-        /// <remarks>
-        /// This action is restricted to users with the Doctor role. The appointment must exist
-        /// and be eligible for adding attachments.
-        /// </remarks>
-        /// <param name="id">The unique identifier of the appointment to which the attachment will be added.</param>
-        /// <param name="file">The file to be uploaded as an attachment.</param>
-        /// <param name="type">The type of the attachment.</param>
-        /// <returns>The unique identifier of the newly created attachment.</returns>
-        /// <response code="201">The attachment was successfully uploaded. The response body contains the ID of the new attachment.</response>
-        /// <response code="400">The request is invalid, such as missing required fields or invalid file format.</response>
-        /// <summary>
         /// Uploads an attachment and associates it with the specified appointment.
         /// </summary>
         /// <param name="id">The appointment identifier to attach the file to.</param>
