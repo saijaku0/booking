@@ -31,16 +31,12 @@ namespace Booking.API.Controllers
         /// Creates a new reservation
         /// </summary>
         /// <remarks>Checks if the time slot is free. If the slot is occupied or the data is invalid, returns an error</remarks>
-        /// <param name="command">Data for creating a reservation</param>
-        /// <returns>ID of the created reservation</returns>
+        /// <param name="command">Command containing the appointment details to create (patient, doctor, time range and any required metadata).</param>
+        /// <returns>The identifier of the newly created appointment.</returns>
         /// <response code="200">Successfully created. The Location header will contain a link to the resource</response>
         /// <summary>
         /// Creates a new appointment for the authenticated patient.
         /// </summary>
-        /// <param name="command">Command containing the appointment details to create (patient, doctor, time range and any required metadata).</param>
-        /// <returns>The identifier of the newly created appointment.</returns>
-        /// <response code="201">Appointment created successfully; Location header points to the newly created appointment.</response>
-        /// <response code="400">Validation error (incorrect dates) or overlap with another booking.</response>
         [HttpPost]
         [Authorize(Roles = Roles.Patient)]
         [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
@@ -173,21 +169,14 @@ namespace Booking.API.Controllers
         }
 
         /// <summary>
-        /// Marks an appointment as completed.
+        /// Marks the specified appointment as complete.
         /// </summary>
         /// <remarks>
         /// Can only be performed by the assigned doctor or an admin.
         /// The appointment must be in 'Confirmed' status.
         /// </remarks>
-        /// <param name="id">Appointment ID</param>
+        /// <param name="id">The unique identifier of the appointment to complete. Must match command.AppointmentId.</param>
         /// <param name="command">Data required to complete the appointment, including diagnosis and optional medical notes.</param>
-        /// <response code="204">Success</response>
-        /// <response code="400">Invalid status (e.g. already canceled)</response>
-        /// <summary>
-        /// Marks the specified appointment as complete.
-        /// </summary>
-        /// <param name="id">The unique identifier of the appointment to complete.</param>
-        /// <param name="command">The command containing the appointment id and completion details.</param>
         /// <returns>
         /// 204 No Content on success; 400 Bad Request if <paramref name="id"/> does not match <c>command.AppointmentId</c>; 403 if the caller is not authorized.
         /// </returns>
@@ -196,6 +185,7 @@ namespace Booking.API.Controllers
         [Authorize(Roles = Roles.Admin + "," + Roles.Doctor)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> CompleteAppointment(
             Guid id,
             [FromBody] CompleteAppointmentCommand command)
@@ -276,14 +266,6 @@ namespace Booking.API.Controllers
         /// </summary>
         /// <remarks>This action is restricted to users with the Doctor role. The appointment must exist
         /// and be eligible for rescheduling.</remarks>
-        /// <param name="id">The unique identifier of the appointment to reschedule.</param>
-        /// <param name="request">The request containing the new start and end times for the appointment. Cannot be null.</param>
-        /// <returns>An HTTP 204 No Content response if the appointment is successfully rescheduled.</returns>
-        /// <response code="204">The appointment was successfully rescheduled.</response>
-        /// <response code="400">The request is invalid, such as missing required fields or invalid date formats.</response>
-        /// <summary>
-        /// Reschedules the specified appointment to new start and end times.
-        /// </summary>
         /// <param name="id">The appointment's unique identifier.</param>
         /// <param name="request">The new start and end times for the appointment.</param>
         /// <response code="204">The appointment was successfully rescheduled.</response>
@@ -318,14 +300,6 @@ namespace Booking.API.Controllers
         /// <response code="201">The attachment was successfully uploaded. The response body contains the ID of the new attachment.</response>
         /// <response code="400">The request is invalid, such as missing required fields or invalid file format.</response>
         /// <response code="404">No appointment was found with the specified ID.</response>
-        /// <summary>
-        /// Uploads a file attachment for the specified appointment.
-        /// </summary>
-        /// <param name="id">The appointment identifier to attach the file to.</param>
-        /// <param name="file">The file to upload.</param>
-        /// <param name="type">The attachment category.</param>
-        /// <returns>The GUID of the created attachment.</returns>
-        /// <response code="403">The user is not authorized to upload attachments to this appointment.</response>
         [Authorize(Roles = Roles.Doctor)]
         [HttpPost("{id:guid}/attachments")]
         [Consumes("multipart/form-data")]
