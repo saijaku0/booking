@@ -7,6 +7,7 @@
         public string FileName { get; private set; } = string.Empty;
         public string FilePath { get; private set; } = string.Empty;
         public string FileType { get; private set; } = string.Empty;
+        public DateTime DateCreated { get; private set; }
         public AttachmentType Type { get; private set; }
 
         private static readonly HashSet<string> _allowedFileTypes = [ 
@@ -25,7 +26,10 @@
             AttachmentType type)
         {
             Id = Guid.NewGuid();
+            DateCreated = DateTime.UtcNow;
             AppointmentId = appointmentId;
+
+            Type = type;
 
             SetFileName(fileName);
             SetFilePath(filePath);

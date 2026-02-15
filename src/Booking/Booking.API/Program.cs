@@ -5,6 +5,7 @@ using Booking.Domain.Entities;
 using Booking.Infrastructure;
 using Booking.Infrastructure.Persistence;
 using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using QuestPDF.Infrastructure;
 using Scalar.AspNetCore;
@@ -41,7 +42,7 @@ builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(CreateAppointmentCommand).Assembly);
 
-    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+    cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 });
 
 builder.Services.AddCors(options =>
