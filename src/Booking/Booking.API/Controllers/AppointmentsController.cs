@@ -3,6 +3,7 @@ using Booking.Application.Appointments.Commands.CancelAppointment;
 using Booking.Application.Appointments.Commands.CompleteAppointment;
 using Booking.Application.Appointments.Commands.ConfirmAppointment;
 using Booking.Application.Appointments.Commands.CreateAppointment;
+using Booking.Application.Appointments.Commands.DeleteAttachment;
 using Booking.Application.Appointments.Commands.RescheduleAppointment;
 using Booking.Application.Appointments.Commands.UploadAttachment;
 using Booking.Application.Appointments.Dtos;
@@ -323,6 +324,20 @@ namespace Booking.API.Controllers
                 new { id },
                 attachmentId
             );
+        }
+
+        [Authorize(Roles = Roles.Doctor)]
+        [HttpDelete("{appointmentId:guid}/attachments/{attachmentId:guid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> DeleteAttachment(
+            Guid appointmentId,
+            Guid attachmentId)
+        {
+            var command = new DeleteAttachmentCommand(appointmentId, attachmentId);
+            await _mediator.Send(command);
+            return NoContent();
         }
     }
 }
