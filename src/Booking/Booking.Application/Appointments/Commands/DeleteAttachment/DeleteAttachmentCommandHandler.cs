@@ -1,4 +1,4 @@
-﻿using Booking.Application.Common.Exceptions;
+using Booking.Application.Common.Exceptions;
 using Booking.Application.Common.Interfaces;
 using Booking.Domain.Entities;
 using MediatR;
@@ -19,6 +19,13 @@ namespace Booking.Application.Appointments.Commands.DeleteAttachment
         private readonly IFileStorageService _fileStorageService = fileStorageService;
         private readonly ILogger<DeleteAttachmentCommandHandler> _logger = logger;
 
+        /// <summary>
+        /// Deletes the specified attachment from the given appointment and attempts to remove its file from storage.
+        /// </summary>
+        /// <param name="request">Command containing the appointment ID and the attachment ID to remove.</param>
+        /// <param name="cancellationToken">Cancellation token that can be used to cancel the operation.</param>
+        /// <exception cref="NotFoundException">Thrown when the appointment or the specified attachment cannot be found.</exception>
+        /// <exception cref="UnauthorizedAccessException">Thrown when the user is not authenticated or is not the doctor of the appointment.</exception>
         public async Task Handle(DeleteAttachmentCommand request, CancellationToken cancellationToken)
         {
             var appointment = await _context.Appointments

@@ -90,6 +90,13 @@ public class Appointment
         Status = AppointmentStatus.Completed;
     }
 
+    /// <summary>
+    /// Reschedules the appointment to the specified start and end times and marks it as pending.
+    /// </summary>
+    /// <param name="newStart">The new start time for the appointment.</param>
+    /// <param name="newEnd">The new end time for the appointment.</param>
+    /// <exception cref="InvalidOperationException">Thrown if the appointment is canceled.</exception>
+    /// <exception cref="ArgumentException">Thrown if <paramref name="newStart"/> is not before <paramref name="newEnd"/>.</exception>
     public void Reschedule(DateTime newStart, DateTime newEnd)
     {
         if (Status == AppointmentStatus.Canceled)
@@ -102,6 +109,11 @@ public class Appointment
         Status = AppointmentStatus.Pending; 
     }
 
+    /// <summary>
+    /// Removes the appointment attachment with the specified identifier.
+    /// </summary>
+    /// <param name="attachmentId">Identifier of the attachment to remove.</param>
+    /// <exception cref="InvalidOperationException">Thrown when no attachment with the given identifier exists.</exception>
     public void RemoveAttachment(Guid attachmentId)
     {
         var attachment = _attachments.FirstOrDefault(a => a.Id == attachmentId)
