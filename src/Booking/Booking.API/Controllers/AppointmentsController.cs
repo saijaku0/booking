@@ -4,6 +4,7 @@ using Booking.Application.Appointments.Commands.CompleteAppointment;
 using Booking.Application.Appointments.Commands.ConfirmAppointment;
 using Booking.Application.Appointments.Commands.CreateAppointment;
 using Booking.Application.Appointments.Commands.RescheduleAppointment;
+using Booking.Application.Appointments.Commands.UploadAttachment;
 using Booking.Application.Appointments.Dtos;
 using Booking.Application.Appointments.Queries.GetAppointmentById;
 using Booking.Application.Appointments.Queries.GetAppointmentReport;
@@ -12,6 +13,7 @@ using Booking.Application.Appointments.Queries.GetDoctorAppointments;
 using Booking.Application.Appointments.Queries.GetDoctorAvailability;
 using Booking.Application.Appointments.Queries.GetPatientAppointments;
 using Booking.Domain.Constants;
+using Booking.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +36,7 @@ namespace Booking.API.Controllers
         /// <response code="200">Successfully created. The Location header will contain a link to the resource</response>
         /// <response code="400">Validation error (incorrect dates) or overlap with another booking.</response>
         [HttpPost]
-        [Authorize(Roles = Roles.Patient)] 
+        [Authorize(Roles = Roles.Patient)]
         [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateAppointmentCommand command)
@@ -182,7 +184,7 @@ namespace Booking.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CompleteAppointment(
             Guid id,
-            [FromBody] CompleteAppointmentCommand command) 
+            [FromBody] CompleteAppointmentCommand command)
         {
             if (id != command.AppointmentId) return BadRequest();
 
@@ -275,9 +277,49 @@ namespace Booking.API.Controllers
             Guid id,
             [FromBody] RescheduleAppointmentRequest request)
         {
-            await _mediator.Send(new RescheduleAppointmentCommand(id, 
+            await _mediator.Send(new RescheduleAppointmentCommand(id,
                 request.StartTime, request.EndTime));
             return NoContent();
+        }
+
+        /// <summary>
+        /// Uploads an attachment (e.g. medical report, prescription) to a specific appointment.
+        /// </summary>
+        /// <remarks>
+        /// This action is restricted to users with the Doctor role. The appointment must exist
+        /// and be eligible for adding attachments.
+        /// </remarks>
+        /// <param name="id">The unique identifier of the appointment to which the attachment will be added.</param>
+        /// <param name="file">The file to be uploaded as an attachment.</param>
+        /// <param name="type">The type of the attachment.</param>
+        /// <returns>The unique identifier of the newly created attachment.</returns>
+        /// <response code="201">The attachment was successfully uploaded. The response body contains the ID of the new attachment.</response>
+        /// <response code="400">The request is invalid, such as missing required fields or invalid file format.</response>
+        /// <response code="404">No appointment was found with the specified ID.</response>
+        /// <response code="403">The user is not authorized to upload attachments to this appointment.</response>
+        [Authorize(Roles = Roles.Doctor)]
+        [HttpPost("{id:guid}/attachments")]
+        [Consumes("multipart/form-data")]
+        [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> UploadAttachment(
+            Guid id,
+            [FromForm] IFormFile file,
+            [FromForm] AttachmentType type)
+        {
+            var command = new UploadAttachmentCommand(
+                File: file,
+                AppointmentId: id,
+                FileType: type
+            );
+            var attachmentId = await _mediator.Send(command);
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id },
+                attachmentId
+            );
         }
     }
 }
