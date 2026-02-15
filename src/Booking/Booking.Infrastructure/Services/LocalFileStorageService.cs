@@ -34,6 +34,23 @@ namespace Booking.Infrastructure.Services
             return $"/{DocumentsUploadsFolder}/{uniqueFileName}";
         }
 
+        public Task DeleteFile(string fileUrl)
+        {
+            if (string.IsNullOrEmpty(fileUrl))
+                return Task.CompletedTask;
+
+            var fullPath = Path.GetFullPath(
+                Path.Combine(_webHostEnvironment.WebRootPath, fileUrl.TrimStart('/'))
+            );
+
+            if (!fullPath.StartsWith(_webHostEnvironment.WebRootPath))
+                throw new UnauthorizedAccessException("Invalid file path.");
+
+            if (File.Exists(fullPath))
+                File.Delete(fullPath);
+            return Task.CompletedTask;
+        }
+
         private async Task<string> SaveStreamAsync(Stream fileStream, string fileName, string folder)
         {
             var uploadsPath = Path.Combine(_webHostEnvironment.WebRootPath, folder);

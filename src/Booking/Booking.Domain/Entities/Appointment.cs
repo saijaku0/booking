@@ -101,4 +101,11 @@ public class Appointment
         EndTime = newEnd;
         Status = AppointmentStatus.Pending; 
     }
+
+    public void RemoveAttachment(Guid attachmentId)
+    {
+        var attachment = _attachments.FirstOrDefault(a => a.Id == attachmentId)
+            ?? throw new InvalidOperationException("Attachment not found.");
+        _attachments.Remove(attachment);
+    }
 }

@@ -70,5 +70,17 @@ namespace Booking.Domain.Entities
 
             FileType = normalizedFileType;
         }
+
+        public void DeleteFile(string fileName)
+        {
+            if(fileName != FileName)
+                throw new ArgumentException("The specified file name does not match the attachment's file name.");
+            if (File.Exists(fileName))
+                throw new InvalidOperationException("Cannot delete file because it still exists on the file system. Please ensure the file is deleted from storage before removing the attachment.");
+
+            FilePath = string.Empty;
+            FileName = string.Empty;
+            FileType = string.Empty;
+        }
     }
 }
