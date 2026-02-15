@@ -14,11 +14,13 @@ public class Doctor
     public string? Bio { get; private set; }
     public int ExperienceYears { get; private set; }
     public string? ImageUrl { get; private set; }
+    public void Deactivate() { IsActive = false; }
     public virtual DoctorScheduleConfig? ScheduleConfig { get; private set; }
     public bool IsActive { get; private set; }
     [Column(TypeName = "decimal(18,2)")]
     public decimal ConsultationFee { get; private set; }
     private readonly List<Review> _reviews = new();
+    public List<Appointment> Appointments { get; set; } = new();
     public IReadOnlyCollection<Review> Reviews => _reviews.AsReadOnly();
 
     private Doctor() { }
