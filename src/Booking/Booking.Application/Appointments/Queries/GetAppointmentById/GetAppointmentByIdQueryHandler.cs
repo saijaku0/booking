@@ -1,4 +1,5 @@
-﻿using Booking.Application.Appointments.Dtos;
+﻿using Booking.Application.Appointments.Common.Extensions;
+using Booking.Application.Appointments.Dtos;
 using Booking.Application.Common.Exceptions;
 using Booking.Application.Common.Interfaces;
 using Booking.Domain.Entities;
@@ -23,6 +24,9 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentById
                 .FirstOrDefaultAsync(a => a.Id == request.Id, cancellationToken)
                 ?? throw new NotFoundException(nameof(Appointment), request.Id);
 
+            var DoctorName = $"{appointment.Doctor.ApplicationUser.FirstName} {appointment.Doctor.ApplicationUser.LastName}";
+            var PatientName = $"{appointment.Patient.ApplicationUser.FirstName} {appointment.Patient.ApplicationUser.LastName}";
+
             return new AppointmentDetailDto
             {
                 Id = appointment.Id,
@@ -35,21 +39,15 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentById
                 Status = appointment.Status.ToString(),
                 MedicalNotes = appointment.MedicalNotes,
 
-                DoctorName = $"{appointment.Doctor.ApplicationUser.FirstName} {appointment.Doctor.ApplicationUser.LastName}",
+                DoctorName = DoctorName,
                 DoctorPhotoUrl = appointment.Doctor.ApplicationUser.PhotoUrl,
                 DoctorPhoneNumber = appointment.Doctor.ApplicationUser.PhoneNumber,
                 Price = appointment.Doctor.ConsultationFee,
                 Specialty = appointment.Doctor.Specialty.Name,
 
-                Attachments = [.. appointment.Attachments.Select(att => new AttachmentDto
-                {
-                    Id = att.Id,
-                    FileName = att.FileName,
-                    FileType = att.FileType,
-                    CreatedAt = att.DateCreated
-                })],
+                Attachments = appointment.Attachments.ToAttachmentDtos(),
 
-                PatientName = $"{appointment.Patient.ApplicationUser.FirstName} {appointment.Patient.ApplicationUser.LastName}"
+                PatientName = PatientName
             };
         }
     }
