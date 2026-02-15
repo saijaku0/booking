@@ -1,4 +1,6 @@
-﻿using Booking.Application.Common.Interfaces;
+﻿using Booking.Application.Common.Extension;
+using Booking.Application.Common.Interfaces;
+using Booking.Application.Common.Models;
 using Booking.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -38,6 +40,27 @@ namespace Booking.Infrastructure.Services
             var result = await _authorizationService.AuthorizeAsync(principal, policyName);
 
             return result.Succeeded;
+        }
+
+        public async Task<Result> DisableUserAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return Result.Failure(["User not found"]);
+            }
+
+            var lockoutResult = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+
+            if (!lockoutResult.Succeeded)
+            {
+                return lockoutResult.ToApplicationResult();
+            }
+
+            await _userManager.UpdateSecurityStampAsync(user);
+
+            return Result.Success();
         }
     }
 }

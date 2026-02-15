@@ -60,7 +60,7 @@ public class BookingDbContext(DbContextOptions<BookingDbContext> options)
                    .HasConversion<string>();
 
             builder.HasOne(a => a.Doctor)
-                   .WithMany()
+                   .WithMany(d => d.Appointments)
                    .HasForeignKey(a => a.DoctorId)
                    .IsRequired();
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Booking.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Booking.Infrastructure.Migrations
 {
     [DbContext(typeof(BookingDbContext))]
-    partial class BookingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260215154948_UpdateDateCreatedAttachments")]
+    partial class UpdateDateCreatedAttachments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -488,7 +491,7 @@ namespace Booking.Infrastructure.Migrations
             modelBuilder.Entity("Booking.Domain.Entities.Appointment", b =>
                 {
                     b.HasOne("Booking.Domain.Entities.Doctor", "Doctor")
-                        .WithMany("Appointments")
+                        .WithMany()
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -638,8 +641,6 @@ namespace Booking.Infrastructure.Migrations
 
             modelBuilder.Entity("Booking.Domain.Entities.Doctor", b =>
                 {
-                    b.Navigation("Appointments");
-
                     b.Navigation("Reviews");
 
                     b.Navigation("ScheduleConfig");

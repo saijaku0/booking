@@ -1,5 +1,6 @@
 ﻿using Booking.API.Dtos.Doctor;
 using Booking.Application.Doctors.Command.CreateDoctor;
+using Booking.Application.Doctors.Command.DeleteDoctor;
 using Booking.Application.Doctors.Command.UpdateDoctor;
 using Booking.Application.Doctors.Command.UpdateProfilePhoto;
 using Booking.Application.Doctors.Command.UpdateScheduleConfig;
@@ -222,6 +223,26 @@ namespace Booking.API.Controllers
             var query = new GetDoctorSlotsQuery(id, date);
             var slots = await _mediator.Send(query);
             return Ok(slots);
+        }
+
+        /// <summary>
+        /// Deletes the doctor with the specified unique identifier.    
+        /// </summary>
+        /// <remarks>Requires the caller to have the Admin role. This operation is not
+        /// reversible.</remarks>
+        /// <param name="id">The unique identifier of the doctor to delete.</param>
+        /// <returns>A 204 No Content response if the doctor was successfully deleted; a 404 Not Found response if no doctor with
+        /// the specified identifier exists; or a 400 Bad Request response if the identifier is invalid.</returns>
+        [HttpDelete("{id}")]
+        [Authorize(Roles = Roles.Admin)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)] 
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await _mediator.Send(new DeleteDoctorCommand(id));
+
+            return NoContent();
         }
     }
 }
