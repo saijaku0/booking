@@ -300,6 +300,16 @@ namespace Booking.API.Controllers
         /// <returns>The unique identifier of the newly created attachment.</returns>
         /// <response code="201">The attachment was successfully uploaded. The response body contains the ID of the new attachment.</response>
         /// <response code="400">The request is invalid, such as missing required fields or invalid file format.</response>
+        /// <summary>
+        /// Uploads an attachment and associates it with the specified appointment.
+        /// </summary>
+        /// <param name="id">The appointment identifier to attach the file to.</param>
+        /// <param name="file">The file to upload as the attachment.</param>
+        /// <param name="type">The attachment type.</param>
+        /// <returns>The identifier of the created attachment.</returns>
+        /// <response code="201">Attachment created; the response body contains the new attachment's identifier.</response>
+        /// <response code="400">The request was invalid.</response>
+        /// <response code="403">The caller is not authorized to upload attachments for the appointment.</response>
         /// <response code="404">No appointment was found with the specified ID.</response>
         [Authorize(Roles = Roles.Doctor)]
         [HttpPost("{id:guid}/attachments")]
@@ -326,6 +336,12 @@ namespace Booking.API.Controllers
             );
         }
 
+        /// <summary>
+        /// Deletes an attachment from the specified appointment.
+        /// </summary>
+        /// <param name="appointmentId">The identifier of the appointment containing the attachment.</param>
+        /// <param name="attachmentId">The identifier of the attachment to delete.</param>
+        /// <returns>204 No Content if the attachment was deleted; 404 Not Found if the appointment or attachment does not exist; 403 Forbidden if the caller is not authorized.</returns>
         [Authorize(Roles = Roles.Doctor)]
         [HttpDelete("{appointmentId:guid}/attachments/{attachmentId:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

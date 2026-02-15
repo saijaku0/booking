@@ -59,6 +59,13 @@ namespace Booking.Domain.Entities
             FileName = fileName;
         }
 
+        /// <summary>
+        /// Validates the provided MIME file type and assigns it to the attachment.
+        /// </summary>
+        /// <param name="fileType">The MIME type to set (e.g., "image/png", "application/pdf").</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="fileType"/> is empty or whitespace, or when it is not one of the allowed MIME types.
+        /// </exception>
         public void SetFileType(string fileType)
         {
             if (string.IsNullOrWhiteSpace(fileType))
@@ -71,6 +78,12 @@ namespace Booking.Domain.Entities
             FileType = normalizedFileType;
         }
 
+        /// <summary>
+        /// Removes attachment metadata for the specified file name after confirming the name matches and the physical file is not present on disk.
+        /// </summary>
+        /// <param name="fileName">The name of the file to remove from the attachment record.</param>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="fileName"/> does not match the attachment's current <see cref="FileName"/>.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if a file with the specified name still exists on the file system; the file must be deleted from storage before removing the attachment.</exception>
         public void DeleteFile(string fileName)
         {
             if(fileName != FileName)
