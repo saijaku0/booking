@@ -21,6 +21,8 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentById
                 .AsNoTracking()
                 .Include(a => a.Doctor)
                     .ThenInclude(d => d.Specialty)
+                .Include(b => b.Doctor)
+                    .ThenInclude(d => d.ApplicationUser)
                 .Include(a => a.Patient) 
                     .ThenInclude(p => p.ApplicationUser)
                 .Include(a => a.Attachments)
