@@ -26,7 +26,7 @@ namespace Booking.Application.Identity.Commands.RegisterUser
                 lastName: request.UserSurname,
                 email: request.UserEmail,
                 phoneNumber: request.PhoneNumber ?? string.Empty,
-                adress: request.Address ?? string.Empty
+                address: request.Address ?? string.Empty
             );
 
             var createResult = await _userManager.CreateAsync(user, request.UserPassword);
