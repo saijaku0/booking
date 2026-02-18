@@ -46,9 +46,9 @@ namespace Booking.Domain.Entities
         string lastname,
         string? phoneNumber)
         {
-            if (!string.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name))
                 throw new ArgumentException("Name cannot be empty.");
-            if (!string.IsNullOrEmpty(lastname))
+            if (string.IsNullOrEmpty(lastname))
                 throw new ArgumentException("Last name cannot be empty.");
 
             FirstName = name;
