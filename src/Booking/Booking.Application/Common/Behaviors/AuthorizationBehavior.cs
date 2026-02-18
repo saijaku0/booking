@@ -1,6 +1,6 @@
-﻿using Booking.Application.Common.Interfaces;
+﻿using Booking.Application.Common.Exceptions;
+using Booking.Application.Common.Interfaces;
 using Booking.Application.Common.Security;
-using Booking.Application.Doctors.Command.DeleteDoctor;
 using MediatR;
 using System.Reflection;
 

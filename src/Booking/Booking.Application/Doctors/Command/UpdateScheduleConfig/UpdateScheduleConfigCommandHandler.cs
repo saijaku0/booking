@@ -1,5 +1,5 @@
-﻿using Booking.Application.Common.Interfaces;
-using Booking.Application.Doctors.Command.DeleteDoctor;
+﻿using Booking.Application.Common.Exceptions;
+using Booking.Application.Common.Interfaces;
 using Booking.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

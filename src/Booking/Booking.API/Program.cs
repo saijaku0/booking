@@ -43,7 +43,8 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(CreateAppointmentCommand).Assembly);
 
     cfg.AddBehavior(typeof(IPipelineBehavior<,>));
-    cfg.AddOpenBehaviors([typeof(ValidationBehavior<,>), typeof(AuthorizationBehavior<,>)]);
+    cfg.AddOpenBehavior(typeof(AuthorizationBehavior<,>));
+    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
 builder.Services.AddCors(options =>

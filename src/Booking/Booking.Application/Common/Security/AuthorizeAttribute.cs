@@ -14,7 +14,7 @@
             } 
         }
 
-        // Now it's useless but in future
-        public string Policy { get; set; }
+        //TO DO: Now it's useless but in future
+        public string? Policy { get; set; }
     }
 }

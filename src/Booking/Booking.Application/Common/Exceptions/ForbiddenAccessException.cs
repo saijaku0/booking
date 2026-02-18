@@ -1,4 +1,4 @@
-﻿namespace Booking.Application.Doctors.Command.DeleteDoctor
+﻿namespace Booking.Application.Common.Exceptions
 {
     [Serializable]
     internal class ForbiddenAccessException : Exception
