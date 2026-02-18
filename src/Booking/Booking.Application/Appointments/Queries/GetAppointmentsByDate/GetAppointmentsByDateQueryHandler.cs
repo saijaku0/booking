@@ -8,32 +8,32 @@ using Microsoft.EntityFrameworkCore;
 namespace Booking.Application.Appointments.Queries.GetAppointmentsByDate
 {
     public class GetAppointmentsByDateQueryHandler(
-        IBookingDbContext context,
-        IIdentityService identityService) 
+        IBookingDbContext context) 
         : IRequestHandler<GetAppointmentsByDateQuery, List<AppointmentListDto>>
     {
         private readonly IBookingDbContext _context = context;
-        private readonly IIdentityService _identityService = identityService;
 
         public async Task<List<AppointmentListDto>> Handle(
             GetAppointmentsByDateQuery request, 
             CancellationToken cancellationToken)
         {
             var doctorInfo = await _context.Doctors
-            .Include(d => d.Specialty) 
-            .Where(d => d.Id == request.DoctorId)
-            .Select(d => new
-            {
-                FullName = $"{d.ApplicationUser.FirstName} {d.ApplicationUser.LastName}",
-                Specialty = d.Specialty != null ? d.Specialty.Name : "General"
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+                .Include(d => d.Specialty) 
+                .Where(d => d.Id == request.DoctorId)
+                .Select(d => new
+                {
+                    FullName = $"{d.ApplicationUser.FirstName} {d.ApplicationUser.LastName}",
+                    Specialty = d.Specialty != null ? d.Specialty.Name : "General"
+                })
+                .FirstOrDefaultAsync(cancellationToken);
 
             string docName = doctorInfo?.FullName ?? "Unknown Doctor";
             string docSpecialty = doctorInfo?.Specialty ?? "Unknown";
 
             var appointments = await _context.Appointments
                 .AsNoTracking()
+                .Include(a => a.Patient)
+                    .ThenInclude(p => p.ApplicationUser)
                 .Where(a => a.Status != AppointmentStatus.Canceled)
                 .Where(a => a.DoctorId == request.DoctorId)
                 .WhereOverlaps(request.DoctorId,
@@ -45,8 +45,9 @@ namespace Booking.Application.Appointments.Queries.GetAppointmentsByDate
 
             foreach (var app in appointments)
             {
-                var patientName = await _identityService.GetUserNameAsync(app.PatientId.ToString())
-                                  ?? "Unknown Patient";
+                var patientName = app.Patient?.ApplicationUser != null
+                    ? $"{app.Patient.ApplicationUser.FirstName} {app.Patient.ApplicationUser.LastName}"
+                    : "Unknown Patient";
 
                 result.Add(new AppointmentListDto
                 {
