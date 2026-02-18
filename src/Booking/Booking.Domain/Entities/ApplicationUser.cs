@@ -61,7 +61,7 @@ namespace Booking.Domain.Entities
             string lastName,
             string email,
             string phoneNumber,
-            string adress)
+            string address)
         {
             return new ApplicationUser
             {
@@ -70,7 +70,7 @@ namespace Booking.Domain.Entities
                 FirstName = firstName,
                 LastName = lastName,
                 PhoneNumber = phoneNumber,
-                Address = adress,
+                Address = address,
                 EmailConfirmed = true
             };
         }

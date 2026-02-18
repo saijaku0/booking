@@ -1,7 +1,10 @@
-﻿using MediatR;
+﻿using Booking.Application.Common.Security;
+using Booking.Domain.Constants;
+using MediatR;
 
 namespace Booking.Application.Doctors.Command.UpdateScheduleConfig
 {
+    [Authorize(Roles = [Roles.Doctor])]
     public record UpdateScheduleConfigCommand(
         Guid DoctorId,
         TimeSpan DayStart,
