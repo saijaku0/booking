@@ -35,7 +35,7 @@ namespace Booking.Application.Doctors.Command.UpdateDoctor
             var currentUser = await _userManager.FindByIdAsync(currentDoctorId);
             var isAdmin = currentUser != null && await _userManager.IsInRoleAsync(currentUser, Roles.Admin);
 
-            if (!isOwner && isAdmin)
+            if (!isOwner && !isAdmin)
                 throw new UnauthorizedAccessException("You can only edit your own profile.");
 
             doctor.UpdateProfile(
@@ -45,9 +45,10 @@ namespace Booking.Application.Doctors.Command.UpdateDoctor
                 request.IsActive,
                 request.ConsultationFee);
 
-            doctor.ApplicationUser.FirstName = request.Name;
-            doctor.ApplicationUser.LastName = request.Lastname;
-            doctor.ApplicationUser.PhoneNumber = request.PhoneNumber;
+            doctor.ApplicationUser.UpdatePersonalInfo(
+                request.Name,
+                request.Lastname,
+                request.PhoneNumber);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
 

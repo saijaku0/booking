@@ -19,15 +19,13 @@ namespace Booking.Application.Doctors.Command.CreateDoctor
             CreateDoctorCommand createDoctor, 
             CancellationToken cancellationToken)
         {
-            var user = new ApplicationUser
-            {
-                UserName = createDoctor.Email,
-                Email = createDoctor.Email,
-                FirstName = createDoctor.Name,
-                LastName = createDoctor.Lastname,
-                PhoneNumber = createDoctor.PhoneNumber,
-                EmailConfirmed = true,
-            };
+            var user = ApplicationUser.CreateDoctor
+            (
+                email: createDoctor.Email,
+                firstName: createDoctor.Name,
+                lastName: createDoctor.Lastname,
+                phoneNumber: createDoctor.PhoneNumber
+            );
 
             (await _userManager.CreateAsync(user, createDoctor.Password))
                 .EnsureSucceeded("CreateDoctor");

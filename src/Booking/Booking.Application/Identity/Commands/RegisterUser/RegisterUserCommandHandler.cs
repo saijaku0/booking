@@ -20,16 +20,14 @@ namespace Booking.Application.Identity.Commands.RegisterUser
             RegisterUserCommand request, 
             CancellationToken cancellationToken)
         {
-            var user = new ApplicationUser
-            {
-                FirstName = request.UserName,
-                LastName = request.UserSurname,
-                Email = request.UserEmail,
-                UserName = request.UserEmail,
-                PhoneNumber = request.PhoneNumber,
-                Address = request.Address,
-                EmailConfirmed = true 
-            };
+            var user = ApplicationUser.CreatePatient
+            (
+                firstName: request.UserName,
+                lastName: request.UserSurname,
+                email: request.UserEmail,
+                phoneNumber: request.PhoneNumber ?? string.Empty,
+                adress: request.Address ?? string.Empty
+            );
 
             var createResult = await _userManager.CreateAsync(user, request.UserPassword);
 
