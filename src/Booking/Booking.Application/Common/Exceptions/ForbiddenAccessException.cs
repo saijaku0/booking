@@ -1,7 +1,7 @@
 ﻿namespace Booking.Application.Common.Exceptions
 {
     [Serializable]
-    internal class ForbiddenAccessException : Exception
+    public class ForbiddenAccessException : Exception
     {
         public ForbiddenAccessException()
         {

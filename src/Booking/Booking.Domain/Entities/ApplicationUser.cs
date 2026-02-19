@@ -12,6 +12,8 @@ namespace Booking.Domain.Entities
         public virtual Patient? PatientProfile { get; private set; }
         public virtual Doctor? DoctorProfile { get; private set; }
 
+        public string FullName => $"{FirstName} {LastName}";
+
         private ApplicationUser() { }
 
         public ApplicationUser(

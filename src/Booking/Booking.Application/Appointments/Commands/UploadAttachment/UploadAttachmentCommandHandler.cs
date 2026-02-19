@@ -15,17 +15,13 @@ namespace Booking.Application.Appointments.Commands.UploadAttachment
         private readonly IFileStorageService _fileStorageService = fileStorageService;
         private readonly ICurrentUserService _userService = userService;
 
-        /// <summary>
-        /// Uploads a file as an attachment to the specified appointment and returns the new attachment's identifier.
-        /// </summary>
-        /// <param name="request">Command containing the target appointment ID, the uploaded file, and the attachment file type.</param>
-        /// <returns>The identifier of the created attachment.</returns>
-        /// <exception cref="NotFoundException">Thrown when no appointment exists with the specified ID.</exception>
-        /// <exception cref="UnauthorizedAccessException">Thrown when the current user is not authenticated or is not the appointment's patient or doctor.</exception>
         public async Task<Guid> Handle(
             UploadAttachmentCommand request, 
             CancellationToken cancellationToken)
         {
+            var userId = _userService.UserId
+                ?? throw new UnauthorizedAccessException("User is not authorized.");
+
             var appointment = await _dbContext.Appointments
                 .Include(a => a.Attachments)
                 .Include(a => a.Patient)
@@ -33,21 +29,35 @@ namespace Booking.Application.Appointments.Commands.UploadAttachment
                 .FirstOrDefaultAsync(a => a.Id == request.AppointmentId, cancellationToken) 
                 ?? throw new NotFoundException(nameof(Appointment), request.AppointmentId);
 
-            var userId = _userService.UserId 
-                ?? throw new UnauthorizedAccessException("User is not authorized");
+            bool isPatient = appointment.Patient?.ApplicationUserId == userId;
+            bool isDoctor = appointment.Doctor?.ApplicationUserId == userId;
+            if (!isPatient && !isDoctor)
+                throw new ForbiddenAccessException("You are not allowed to upload attachments to this appointment.");
 
-            bool isPatient = appointment.Patient.ApplicationUserId == userId;
-            bool isDoctorAttachment = appointment.Doctor.ApplicationUserId == userId;
+            if (request.File == null || request.File.Length == 0)
+                throw new ArgumentException("File is empty.");
 
-            if (!isPatient && !isDoctorAttachment)
-                throw new UnauthorizedAccessException("You can only upload attachments to your own appointments.");
-            
+            const long maxFileSize = 10 * 1024 * 1024; 
+            if (request.File.Length > maxFileSize)
+                throw new ArgumentException($"File size exceeds the limit of {maxFileSize / 1024 / 1024} MB.");
+
+            var allowedMimeTypes = new[] { "image/jpeg", "image/png", "image/gif", "application/pdf" };
+            if (!allowedMimeTypes.Contains(request.File.ContentType))
+                throw new ArgumentException("File type is not allowed.");
+
             var extension = Path.GetExtension(request.File.FileName);
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".pdf" };
+            if (string.IsNullOrEmpty(extension) || !allowedExtensions.Contains(extension))
+                throw new ArgumentException("File extension is not allowed.");
+
             var uniqueFileName = $"{Guid.NewGuid()}{extension}";
 
-            using var stream = request.File.OpenReadStream();
+            await using var stream = request.File.OpenReadStream();
             var fileUrl = await _fileStorageService
-                .UploadFileAsync(stream, uniqueFileName, request.File.ContentType);
+                .UploadFileAsync(
+                stream, 
+                uniqueFileName, 
+                request.File.ContentType);
 
             var attachment = appointment.AddAttachment
             (

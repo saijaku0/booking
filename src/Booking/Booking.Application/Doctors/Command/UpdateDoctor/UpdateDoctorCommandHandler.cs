@@ -21,6 +21,10 @@ namespace Booking.Application.Doctors.Command.UpdateDoctor
             UpdateDoctorCommand request, 
             CancellationToken cancellationToken)
         {
+            var currentUserId = _currentUser.UserId;
+            if (string.IsNullOrEmpty(currentUserId))
+                throw new UnauthorizedAccessException("User is not authenticated.");
+
             var doctor = await _dbContext.Doctors
                 .Include(d => d.ApplicationUser)
                 .FirstOrDefaultAsync(d => d.Id == request.UserId, cancellationToken) 
@@ -37,6 +41,9 @@ namespace Booking.Application.Doctors.Command.UpdateDoctor
 
             if (!isOwner && !isAdmin)
                 throw new UnauthorizedAccessException("You can only edit your own profile.");
+
+            if (doctor.ApplicationUser == null)
+                throw new InvalidOperationException($"Doctor with id {doctor.Id} has no associated user.");
 
             doctor.UpdateProfile(
                 request.Bio,

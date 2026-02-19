@@ -3,6 +3,7 @@ using Booking.Application.Common.Extension;
 using Booking.Application.Common.Interfaces;
 using Booking.Domain.Entities;
 using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,30 @@ namespace Booking.Application.Appointments.Commands.CreateAppointment
 
         public async Task<Guid> Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
         {
+            var userId = _currentUserService.UserId;
+            if (string.IsNullOrEmpty(userId))
+                throw new UnauthorizedAccessException("User is not authenticated.");
+
+            if (request.StartTime >= request.EndTime)
+            {
+                throw new ValidationException(new List<ValidationFailure>
+                    {
+                        new(nameof(request.StartTime), "Start time must be before end time.")
+                    });
+            }
+            if (request.StartTime < DateTime.UtcNow)
+            {
+                throw new ValidationException(new List<ValidationFailure>
+                    {
+                        new(nameof(request.StartTime), "Cannot book appointment in the past.")
+                    });
+            }
+
+            var doctorExists = await _context.Doctors
+            .AnyAsync(d => d.Id == request.DoctorId, cancellationToken);
+            if (!doctorExists)
+                throw new NotFoundException(nameof(Doctor), request.DoctorId);
+
             var isOverLap = await _context.Appointments
                 .Where(a => a.Status != AppointmentStatus.Canceled)
                 .WhereOverlaps(request.DoctorId,
@@ -25,32 +50,35 @@ namespace Booking.Application.Appointments.Commands.CreateAppointment
 
             if (isOverLap)
             {
-                var failure = new FluentValidation.Results.ValidationFailure("TimeSlot", "This time slot is already taken");
-                throw new ValidationException([failure]);
+                var failure = new ValidationFailure(
+                    nameof(request.StartTime),
+                    "This time slot is already taken.");
+                throw new ValidationException(new List<ValidationFailure> { failure });
             }
 
-            //var userId = Guid.Parse(_currentUserService.UserId);
 
-            //if (userId == Guid.Empty)
-            //    throw new UnauthorizedAccessException("User ID is invalid or missing.");
+            var patientId = await _context.Patients
+             .Where(p => p.ApplicationUserId == userId)
+             .Select(p => p.Id)
+             .FirstOrDefaultAsync(cancellationToken);
 
-            var userId = _currentUserService.UserId;
+            if (patientId == Guid.Empty)
+            {
+                var failure = new ValidationFailure(
+                    nameof(userId),
+                    $"Patient profile not found for user {userId}. Please complete your profile registration.");
+                throw new ValidationException(new List<ValidationFailure> { failure });
+            }
 
-            var patient = await _context.Patients
-                .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.ApplicationUserId == userId, cancellationToken)
-                ?? throw new ValidationException(new[] { new FluentValidation.Results.ValidationFailure("Patient", $"Patient profile not found for user {userId}. Please complete your profile registration.") });
-            
 
             Appointment appointment = new(
                 request.DoctorId,
-                patient.Id,
+                patientId,
                 request.StartTime,
                 request.EndTime
             );
 
             _context.Appointments.Add( appointment );
-
             await _context.SaveChangesAsync(cancellationToken);
 
             return appointment.Id;
