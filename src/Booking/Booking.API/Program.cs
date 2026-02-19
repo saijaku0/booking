@@ -42,7 +42,6 @@ builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(CreateAppointmentCommand).Assembly);
 
-    cfg.AddBehavior(typeof(IPipelineBehavior<,>));
     cfg.AddOpenBehavior(typeof(AuthorizationBehavior<,>));
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
