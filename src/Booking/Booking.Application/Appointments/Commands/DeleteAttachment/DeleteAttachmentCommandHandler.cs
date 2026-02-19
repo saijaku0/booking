@@ -19,27 +19,20 @@ namespace Booking.Application.Appointments.Commands.DeleteAttachment
         private readonly IFileStorageService _fileStorageService = fileStorageService;
         private readonly ILogger<DeleteAttachmentCommandHandler> _logger = logger;
 
-        /// <summary>
-        /// Deletes the specified attachment from the given appointment and attempts to remove its file from storage.
-        /// </summary>
-        /// <param name="request">Command containing the appointment ID and the attachment ID to remove.</param>
-        /// <param name="cancellationToken">Cancellation token that can be used to cancel the operation.</param>
-        /// <exception cref="NotFoundException">Thrown when the appointment or the specified attachment cannot be found.</exception>
-        /// <exception cref="UnauthorizedAccessException">Thrown when the user is not authenticated or is not the doctor of the appointment.</exception>
         public async Task Handle(DeleteAttachmentCommand request, CancellationToken cancellationToken)
         {
+            var userId = _currentUserService.UserId
+                ?? throw new UnauthorizedAccessException("User is not authenticated.");
+
             var appointment = await _context.Appointments
                 .Include(a => a.Attachments)
                 .Include(a => a.Doctor)
                 .FirstOrDefaultAsync(a => a.Id == request.AppointmentId, cancellationToken)
                 ?? throw new NotFoundException(nameof(Appointment), request.AppointmentId);
 
-            var userId = _currentUserService.UserId
-                ?? throw new UnauthorizedAccessException("User is not authenticated.");
-
             bool isDoctor = appointment.Doctor.ApplicationUserId == userId;
             if (!isDoctor)
-                throw new UnauthorizedAccessException("Only the doctor can delete attachments.");
+                throw new ForbiddenAccessException("Only the doctor can delete attachments.");
 
             var attachment = appointment.Attachments
                 .FirstOrDefault(a => a.Id == request.AttachmentId)

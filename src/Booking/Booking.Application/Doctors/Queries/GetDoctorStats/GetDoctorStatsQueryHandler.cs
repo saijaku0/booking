@@ -1,22 +1,36 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Booking.Application.Common.Exceptions;
+using Booking.Application.Common.Extension;
 using Booking.Application.Common.Interfaces;
 using Booking.Application.Doctors.Dtos;
-using MediatR;
-using Booking.Application.Common.Extension;
+using Booking.Domain.Constants;
 using Booking.Domain.Entities;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Booking.Application.Doctors.Queries.GetDoctorStats
 {
     public class GetDoctorStatsQueryHandler(
-        IBookingDbContext dbContext)
+        IBookingDbContext dbContext,
+        IIdentityService identityService,
+        ICurrentUserService userService)
         : IRequestHandler<GetDoctorStatsQuery, DoctorStatsDto>
     {
         private readonly IBookingDbContext _dbContext = dbContext;
+        private readonly IIdentityService _identityService = identityService;
+        private readonly ICurrentUserService _userService = userService;
 
         public async Task<DoctorStatsDto> Handle(
             GetDoctorStatsQuery request, 
             CancellationToken cancellationToken)
         {
+            var currentUserId = _userService.UserId;
+            var isAdmin = await _identityService.IsInRoleAsync(currentUserId, Roles.Admin);
+
+            var currentDoctor = await _dbContext.Doctors.FirstOrDefaultAsync(d => d.ApplicationUserId == currentUserId);
+
+            if (!isAdmin && request.DoctorId != currentDoctor.Id)
+                throw new ForbiddenAccessException("You can only view your own stats.");
+
             var now = DateTime.UtcNow;
 
             DateTime startDate = DateTime.UtcNow;

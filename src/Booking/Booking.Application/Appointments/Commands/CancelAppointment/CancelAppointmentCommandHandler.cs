@@ -1,4 +1,5 @@
-﻿using Booking.Application.Common.Interfaces;
+﻿using Booking.Application.Common.Exceptions;
+using Booking.Application.Common.Interfaces;
 using Booking.Domain.Constants;
 using Booking.Domain.Entities;
 using MediatR;
@@ -26,9 +27,14 @@ namespace Booking.Application.Appointments.Commands.CancelAppointment
                 ?? throw new KeyNotFoundException($"Appointment with id {command.Id} was not found.");
 
             var currentUserId = _currentUserService.UserId;
-
             if (string.IsNullOrWhiteSpace(currentUserId))
                 throw new UnauthorizedAccessException("User not authenticated.");
+
+            bool isMyAppointment = appointment.Patient.ApplicationUserId == currentUserId
+                    || appointment.Doctor.ApplicationUserId == currentUserId;
+
+            if (!isMyAppointment)
+                throw new ForbiddenAccessException("You cannot cancel someone else's appointment.");
 
             var user = await _userManager.FindByIdAsync(currentUserId)
                 ?? throw new UnauthorizedAccessException("User not found.");
@@ -41,7 +47,6 @@ namespace Booking.Application.Appointments.Commands.CancelAppointment
                 roles,
                 cancellationToken);
 
-            //_bookingDbContext.Appointments.Remove(appointment);
             appointment.Cancel();
             await _bookingDbContext.SaveChangesAsync(cancellationToken);
         }
